@@ -12,7 +12,7 @@ class RemoteFile implements Filehandle {
   public async read(
     buffer: Buffer,
     offset = 0,
-    length,
+    length: number,
     position = 0,
     opts?: ReadOptions = {}
   ): Promise<number> {
@@ -23,11 +23,11 @@ class RemoteFile implements Filehandle {
       headers.range = `bytes=${position}-`;
     }
     const response = await fetch(this.url, {
+      ...headers,
       method: "GET",
-      headers,
       redirect: "follow",
       mode: "cors",
-      signal: signal
+      signal
     });
 
     if (
@@ -51,17 +51,19 @@ class RemoteFile implements Filehandle {
     throw new Error(`HTTP ${response.status} fetching ${this.url}`);
   }
 
-  public async readFile(opts: Options = {}) {
+  public async readFile(opts: Options = {}): Buffer {
     const { headers = {}, signal } = opts;
     const response = await fetch(this.url, {
+      ...headers,
       method: "GET",
       redirect: "follow",
-      mode: "cors"
+      mode: "cors",
+      signal
     });
     return Buffer.from(await response.arrayBuffer());
   }
 
-  public async stat() {
+  public async stat(): { size: number } {
     if (!this._stat) {
       const buf = Buffer.allocUnsafe(10);
       await this.read(buf, 0, 10, 0);
