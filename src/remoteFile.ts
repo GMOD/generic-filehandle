@@ -28,29 +28,30 @@ class RemoteFile implements Filehandle {
       mode: 'cors',
       signal: signal
     })
+
     if (
       (response.status === 200 && position === 0) ||
       response.status === 206
     ) {
-      Buffer.copy(buffer, Buffer.from(await response.arrayBuffer()))
+      const resp = await response.arrayBuffer()
+      const ret = Buffer.from(resp)
+
+      ret.copy(buffer)
 
       // try to parse out the size of the remote file
       const sizeMatch = /\/(\d+)$/.exec(response.headers.get('content-range'))
       if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
-
-      return nodeBuffer
-    }
-
-    let readPosition = position
-    if (readPosition === null) {
-      readPosition = this.position
       this.position += length
+
+      return resp.byteLength
     }
+
     throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
 
-  async readFile() {
+  async readFile(opts: Options = {}) {
+    const { headers = {}, signal } = opts
     const response = await fetch(this.url, {
       method: 'GET',
       redirect: 'follow',
