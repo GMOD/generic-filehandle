@@ -22,7 +22,7 @@ describe("local file tests", () => {
   });
   it("get stat", async () => {
     const f = new LocalFile(require.resolve("./data/test.txt"));
-    const ret = await f.stat()
-    expect(ret.size).toEqual(8)
+    const ret = await f.stat();
+    expect(ret.size).toEqual(8);
   });
 });

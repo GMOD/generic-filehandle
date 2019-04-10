@@ -20,14 +20,14 @@ class RemoteFile implements Filehandle {
     } else if (length === Infinity && position !== 0) {
       headers.range = `bytes=${position}-`;
     }
-    const final = {
+
+    const response = await fetch(this.url, {
       ...headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
       signal
-    };
-    const response = await fetch(this.url, final);
+    });
 
     if (
       (response.status === 200 && position === 0) ||
