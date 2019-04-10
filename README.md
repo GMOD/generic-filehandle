@@ -6,6 +6,11 @@
 
 Implements local file handles, remote file handles, and blob filehandles
 
+## Usage
+
+    import {LocalFile,RemoteFile} from 'filehandle'
+    new LocalFile('/some/file/path/file.txt')
+    new RemoteFile('http://somesite.com/file.txt')
 
 ## References
 
