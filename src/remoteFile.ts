@@ -3,9 +3,9 @@ import "cross-fetch/polyfill";
 interface Stats {
   size: number
 }
-class RemoteFile implements Filehandle {
+export default class RemoteFile implements Filehandle {
   private url: string;
-  private _stat: Stats
+  private _stat?: Stats
 
   public constructor(source: string) {
     this.url = source;
@@ -16,7 +16,7 @@ class RemoteFile implements Filehandle {
     offset = 0,
     length: number,
     position = 0,
-    opts?: Options = {}
+    opts: Options = {}
   ): Promise<number> {
     const { headers = {}, signal } = opts;
     if (length < Infinity) {
@@ -43,7 +43,8 @@ class RemoteFile implements Filehandle {
       ret.copy(buffer, offset);
 
       // try to parse out the size of the remote file
-      const sizeMatch = /\/(\d+)$/.exec(response.headers.get("content-range"));
+      const res = response.headers.get("content-range")
+      const sizeMatch = /\/(\d+)$/.exec(res||'');
       if (sizeMatch && sizeMatch[1])
         this._stat = { size: parseInt(sizeMatch[1], 10) };
 
@@ -75,5 +76,3 @@ class RemoteFile implements Filehandle {
     return this._stat;
   }
 }
-
-module.exports = RemoteFile;

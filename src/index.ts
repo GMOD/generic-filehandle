@@ -1,11 +1,11 @@
 import * as url from "url";
-import {LocalFile} from "./localFile";
-import {RemoteFile} from "./remoteFile";
+import LocalFile from "./localFile";
+import RemoteFile from "./remoteFile";
 
-function fromUrl(source): FileHandle {
+function fromUrl(source:string): Filehandle {
   const { protocol, pathname } = url.parse(source);
   if (protocol === "file:") {
-    return new LocalFile(unescape(pathname));
+    return new LocalFile(decodeURI(pathname||''));
   }
   return new RemoteFile(source);
 }
@@ -14,9 +14,9 @@ function open(
   maybePath?: string,
   maybeFilehandle?: Filehandle
 ): Filehandle {
-  if (maybeFilehandle) return maybeFilehandle;
-  if (maybeUrl) return fromUrl(maybeUrl);
-  if (maybePath) return new LocalFile(maybePath);
+  if (maybeFilehandle!==undefined) return maybeFilehandle;
+  if (maybeUrl!==undefined) return fromUrl(maybeUrl);
+  if (maybePath!==undefined) return new LocalFile(maybePath);
   throw new Error("no url, path, or filehandle provided, cannot open");
 }
 

@@ -1,13 +1,15 @@
-import fetchMock, {mock} from "fetch-mock";
+import fetchMock from "fetch-mock";
 import { LocalFile, RemoteFile } from "../src/";
-import * as parseRange from "range-parser";
+import rangeParser from 'range-parser'
 fetchMock.config.sendAsJson = false;
+
 const getFile = (url:string) =>
   new LocalFile(require.resolve(url.replace("http://fakehost/", "./data/")));
 // fakes server responses from local file object with fetchMock
 const readBuffer = async (url:string, args:any) => {
   const file = getFile(url);
-  var range = parseRange(1000000, args.range);
+  const range = rangeParser(10000,args.range)
+  // @ts-ignore
   const { start, end } = range[0];
   const len = end - start;
   let buf = Buffer.alloc(len);
@@ -34,13 +36,13 @@ describe("remote file tests", () => {
   afterEach(() => fetchMock.restore());
 
   it("reads file", async () => {
-    mock("http://fakehost/test.txt", readFile);
+    fetchMock.mock("http://fakehost/test.txt", readFile);
     const f = new RemoteFile("http://fakehost/test.txt");
     const b = await f.readFile();
     expect(b.toString()).toEqual("testing\n");
   });
   it("reads remote partially", async () => {
-    mock("http://fakehost/test.txt", readBuffer);
+    fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");
     const buf = Buffer.allocUnsafe(3);
     const bytesRead = await f.read(buf, 0, 3, 0);
@@ -48,7 +50,7 @@ describe("remote file tests", () => {
     expect(bytesRead).toEqual(3);
   });
   it("reads remote clipped at the end", async () => {
-    mock("http://fakehost/test.txt", readBuffer);
+    fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");
     const buf = Buffer.allocUnsafe(3);
     const bytesRead = await f.read(buf, 0, 3, 6);
@@ -56,7 +58,7 @@ describe("remote file tests", () => {
     expect(bytesRead).toEqual(2);
   });
   it("length infinity", async () => {
-    mock("http://fakehost/test.txt", readBuffer);
+    fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");
     const buf = Buffer.allocUnsafe(5);
     const bytesRead = await f.read(buf, 0, Infinity, 3);
@@ -64,13 +66,14 @@ describe("remote file tests", () => {
     expect(bytesRead).toEqual(5);
   });
   it("throws error", async () => {
-    mock("http://fakehost/test.txt", 500);
+    fetchMock.mock("http://fakehost/test.txt", 500);
     const f = new RemoteFile("http://fakehost/test.txt");
-    const res = f.read(null, 0, 0, 0);
+    const buf = Buffer.alloc(10)
+    const res = f.read(buf, 0, 0, 0);
     await expect(res).rejects.toThrow(/fetching/);
   });
   it("stat", async () => {
-    mock("http://fakehost/test.txt", readBuffer);
+    fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");
     const stat = await f.stat();
     expect(stat.size).toEqual(8);
