@@ -9,7 +9,7 @@ const fsRead = fs && promisify(fs.read);
 const fsFStat = fs && promisify(fs.fstat);
 const fsReadFile = fs && promisify(fs.readFile);
 
-export default class LocalFile {
+export default class LocalFile implements Filehandle {
   private fd: any;
   private position: number;
   private filename: string;

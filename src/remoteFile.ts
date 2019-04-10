@@ -1,17 +1,21 @@
 require('cross-fetch/polyfill')
 const BufferCache = require('./bufferCache')
 
-class RemoteFile {
+interface Options {
+  signal?: AbortSignal
+  header?: any
+}
+class RemoteFile implements Filehandle {
+  private position: number
+  private url: string
+
   constructor(source) {
     this.position = 0
     this.url = source
-    this.cache = new BufferCache({
-      fetch: (start, length) => this._fetch(start, length),
-    })
   }
 
-  async _fetch(position, length) {
-    const headers = {}
+  async read(buffer: Buffer, offset = 0, length, position = 0, opts: Options = {}): Promise<number> {
+    const { headers = {}, signal } = opts
     if (length < Infinity) {
       headers.range = `bytes=${position}-${position + length}`
     } else if (length === Infinity && position !== 0) {
@@ -22,30 +26,29 @@ class RemoteFile {
       headers,
       redirect: 'follow',
       mode: 'cors',
+      signal: signal
     })
     if (
       (response.status === 200 && position === 0) ||
       response.status === 206
     ) {
-      const nodeBuffer = Buffer.from(await response.arrayBuffer())
+      Buffer.copy(buffer, Buffer.from(await response.arrayBuffer()))
 
       // try to parse out the size of the remote file
       const sizeMatch = /\/(\d+)$/.exec(response.headers.get('content-range'))
-      if (sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
+      if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
 
       return nodeBuffer
     }
-    throw new Error(`HTTP ${response.status} fetching ${this.url}`)
-  }
 
-  read(buffer, offset = 0, length = Infinity, position = 0) {
     let readPosition = position
     if (readPosition === null) {
       readPosition = this.position
       this.position += length
     }
-    return this.cache.get(buffer, offset, length, position)
+    throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
+
 
   async readFile() {
     const response = await fetch(this.url, {

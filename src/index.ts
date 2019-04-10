@@ -2,7 +2,7 @@ const url = require('url')
 const RemoteFile = require('./remoteFile')
 import LocalFile from './localFile'
 
-function fromUrl(source) {
+function fromUrl(source): FileHandle {
   const { protocol, pathname } = url.parse(source)
   if (protocol === 'file:') {
     return new LocalFile(unescape(pathname))
