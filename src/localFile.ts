@@ -26,7 +26,6 @@ export default class LocalFile implements Filehandle {
     position: number = 0
   ): Promise<number> {
     const ret = await fsRead(await this.fd, buffer, offset, length, position);
-    if (typeof ret === "object") return ret.bytesRead;
     return ret;
   }
 

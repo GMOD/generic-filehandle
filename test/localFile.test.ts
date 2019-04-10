@@ -20,4 +20,9 @@ describe("local file tests", () => {
     expect(buf.slice(0, bytesRead).toString()).toEqual("g\n");
     expect(bytesRead).toEqual(2);
   });
+  it("get stat", async () => {
+    const f = new LocalFile(require.resolve("./data/test.txt"));
+    const ret = await f.stat()
+    expect(ret.size).toEqual(8)
+  });
 });
