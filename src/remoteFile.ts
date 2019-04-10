@@ -22,13 +22,14 @@ class RemoteFile implements Filehandle {
     } else if (length === Infinity && position !== 0) {
       headers.range = `bytes=${position}-`;
     }
-    const response = await fetch(this.url, {
+    const final = {
       ...headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
       signal
-    });
+    };
+    const response = await fetch(this.url, final);
 
     if (
       (response.status === 200 && position === 0) ||
@@ -43,9 +44,9 @@ class RemoteFile implements Filehandle {
       const sizeMatch = /\/(\d+)$/.exec(response.headers.get("content-range"));
       if (sizeMatch && sizeMatch[1])
         this._stat = { size: parseInt(sizeMatch[1], 10) };
-      this.position += length;
 
-      return resp.byteLength;
+      this.position += resp.byteLength;
+      return resp.byteLength; // bytes read
     }
 
     throw new Error(`HTTP ${response.status} fetching ${this.url}`);
