@@ -1,3 +1,6 @@
+- Fix usage of fetch headers
+- Add overrides parameter to options
+
 ## 1.0.1 (2019-04-10)
 
 

@@ -24,6 +24,26 @@ Implements the concept of a filehandle that can be used to access local or remot
     // readFile, returns buffer
     const buf = remote.readFile()
 
+## API
+
+### async read(buf:Buffer, offset: number, length: number, position: number): Promise<number>
+
+* buf - a pre-allocated buffer that can contain length bytes
+* offset - an offset into the buffer to write into
+* length - a length of data to read
+* position - the byte offset in the file to read from
+
+Returns a promise containing bytesRead, and the results in the argument `buf`
+
+### async readFile(): Promise<Buffer>
+
+Returns a promise to a buffer for the whole file
+
+### async stat() : Promise<{size: number}>
+
+Returns a promise to a object containing at a minimum the size of the file
+
+
 ## References
 
 

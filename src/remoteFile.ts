@@ -18,7 +18,7 @@ export default class RemoteFile implements Filehandle {
     position = 0,
     opts: Options = {}
   ): Promise<number> {
-    const { headers = {}, signal } = opts;
+    const { headers = {}, signal, overrides = {} } = opts;
     if (length < Infinity) {
       headers.range = `bytes=${position}-${position + length}`;
     } else if (length === Infinity && position !== 0) {
@@ -26,11 +26,12 @@ export default class RemoteFile implements Filehandle {
     }
 
     const response = await fetch(this.url, {
-      ...headers,
+      headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
-      signal
+      signal,
+      ...overrides
     });
 
     if (
@@ -55,13 +56,14 @@ export default class RemoteFile implements Filehandle {
   }
 
   public async readFile(opts: Options = {}): Promise<Buffer> {
-    const { headers = {}, signal } = opts;
+    const { headers = {}, signal, overrides = {} } = opts;
     const response = await fetch(this.url, {
-      ...headers,
+      headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
-      signal
+      signal,
+      ...overrides
     });
     return Buffer.from(await response.arrayBuffer());
   }

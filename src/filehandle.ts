@@ -1,6 +1,7 @@
 declare interface Options {
   signal?: AbortSignal;
   headers?: any;
+  overrides?: any;
 }
 
 declare interface Filehandle {

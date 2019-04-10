@@ -8,7 +8,7 @@ const getFile = (url: string) =>
 // fakes server responses from local file object with fetchMock
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url);
-  const range = rangeParser(10000, args.range);
+  const range = rangeParser(10000, args.headers.range);
   // @ts-ignore
   const { start, end } = range[0];
   const len = end - start;
