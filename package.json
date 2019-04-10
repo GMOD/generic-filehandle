@@ -1,5 +1,5 @@
 {
-  "name": "filehandle",
+  "name": "generic-filehandle",
   "version": "1.0.1",
   "main": "dist/index.js",
   "license": "MIT",
