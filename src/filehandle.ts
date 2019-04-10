@@ -1,15 +1,15 @@
-export interface ReadOptions {
+declare interface Options {
   signal?: AbortSignal;
-  header?: any;
+  headers?: any;
 }
 
-export interface Filehandle {
+declare interface Filehandle {
   read(
     buf: Buffer,
     offset: number,
     length: number,
     position: number,
-    opts?: ReadOptions
+    opts?: Options
   ): Promise<number>;
   readFile(): Promise<Buffer>;
 }

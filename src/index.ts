@@ -1,6 +1,6 @@
-import url from "url";
-import RemoteFile from "./remoteFile";
-import LocalFile from "./localFile";
+import * as url from "url";
+import {LocalFile} from "./localFile";
+import {RemoteFile} from "./remoteFile";
 
 function fromUrl(source): FileHandle {
   const { protocol, pathname } = url.parse(source);
@@ -10,8 +10,8 @@ function fromUrl(source): FileHandle {
   return new RemoteFile(source);
 }
 function open(
-  maybeUrl: string,
-  maybePath: string,
+  maybeUrl?: string,
+  maybePath?: string,
   maybeFilehandle?: Filehandle
 ): Filehandle {
   if (maybeFilehandle) return maybeFilehandle;
@@ -20,9 +20,4 @@ function open(
   throw new Error("no url, path, or filehandle provided, cannot open");
 }
 
-module.exports = {
-  LocalFile,
-  RemoteFile,
-  fromUrl,
-  open
-};
+export {open, fromUrl, RemoteFile, LocalFile}

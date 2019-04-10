@@ -1,0 +1,1 @@
+- Initial implementation of a filehandle object with local and remote support

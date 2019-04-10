@@ -1,9 +1,13 @@
 import "cross-fetch/polyfill";
 
+interface Stats {
+  size: number
+}
 class RemoteFile implements Filehandle {
   private url: string;
+  private _stat: Stats
 
-  public constructor(source) {
+  public constructor(source: string) {
     this.url = source;
   }
 
@@ -12,7 +16,7 @@ class RemoteFile implements Filehandle {
     offset = 0,
     length: number,
     position = 0,
-    opts?: ReadOptions = {}
+    opts?: Options = {}
   ): Promise<number> {
     const { headers = {}, signal } = opts;
     if (length < Infinity) {
@@ -49,7 +53,7 @@ class RemoteFile implements Filehandle {
     throw new Error(`HTTP ${response.status} fetching ${this.url}`);
   }
 
-  public async readFile(opts: Options = {}): Buffer {
+  public async readFile(opts: Options = {}): Promise<Buffer> {
     const { headers = {}, signal } = opts;
     const response = await fetch(this.url, {
       ...headers,
@@ -61,7 +65,7 @@ class RemoteFile implements Filehandle {
     return Buffer.from(await response.arrayBuffer());
   }
 
-  public async stat(): { size: number } {
+  public async stat(): Promise<Stats> {
     if (!this._stat) {
       const buf = Buffer.allocUnsafe(10);
       await this.read(buf, 0, 10, 0);

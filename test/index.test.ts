@@ -1,5 +1,5 @@
-import fetchMock from "fetch-mock";
-import { open, fromUrl } from "../src/";
+import { LocalFile,open, fromUrl } from "../src/";
+
 describe("test util functions", () => {
   it("fromUrl", async () => {
     const ret = fromUrl("file:///var/");
@@ -10,9 +10,10 @@ describe("test util functions", () => {
     expect(ret.constructor.name).toEqual("RemoteFile");
   });
   it("open", async () => {
+    const f = new LocalFile('/var')
     expect(open("http://google.com").constructor.name).toEqual("RemoteFile");
-    expect(open(null, "/var/").constructor.name).toEqual("LocalFile");
-    expect(open(null, null, 1)).toEqual(1);
-    expect(() => open(null, null, null)).toThrow(/cannot open/);
+    expect(open(undefined, "/var/").constructor.name).toEqual("LocalFile");
+    expect(open(undefined, undefined, f).constructor.name).toEqual("LocalFile");
+    expect(() => open(undefined, undefined, undefined)).toThrow(/cannot open/);
   });
 });
