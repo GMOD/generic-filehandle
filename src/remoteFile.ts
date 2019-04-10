@@ -1,74 +1,75 @@
-require('cross-fetch/polyfill')
-const BufferCache = require('./bufferCache')
+import "cross-fetch/polyfill";
 
-interface Options {
-  signal?: AbortSignal
-  header?: any
-}
 class RemoteFile implements Filehandle {
-  private position: number
-  private url: string
+  private position: number;
+  private url: string;
 
-  constructor(source) {
-    this.position = 0
-    this.url = source
+  public constructor(source) {
+    this.position = 0;
+    this.url = source;
   }
 
-  async read(buffer: Buffer, offset = 0, length, position = 0, opts: Options = {}): Promise<number> {
-    const { headers = {}, signal } = opts
+  public async read(
+    buffer: Buffer,
+    offset = 0,
+    length,
+    position = 0,
+    opts?: ReadOptions = {}
+  ): Promise<number> {
+    const { headers = {}, signal } = opts;
     if (length < Infinity) {
-      headers.range = `bytes=${position}-${position + length}`
+      headers.range = `bytes=${position}-${position + length}`;
     } else if (length === Infinity && position !== 0) {
-      headers.range = `bytes=${position}-`
+      headers.range = `bytes=${position}-`;
     }
     const response = await fetch(this.url, {
-      method: 'GET',
+      method: "GET",
       headers,
-      redirect: 'follow',
-      mode: 'cors',
+      redirect: "follow",
+      mode: "cors",
       signal: signal
-    })
+    });
 
     if (
       (response.status === 200 && position === 0) ||
       response.status === 206
     ) {
-      const resp = await response.arrayBuffer()
-      const ret = Buffer.from(resp)
+      const resp = await response.arrayBuffer();
+      const ret = Buffer.from(resp);
 
-      ret.copy(buffer)
+      ret.copy(buffer, offset);
 
       // try to parse out the size of the remote file
-      const sizeMatch = /\/(\d+)$/.exec(response.headers.get('content-range'))
-      if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
-      this.position += length
+      const sizeMatch = /\/(\d+)$/.exec(response.headers.get("content-range"));
+      if (sizeMatch && sizeMatch[1])
+        this._stat = { size: parseInt(sizeMatch[1], 10) };
+      this.position += length;
 
-      return resp.byteLength
+      return resp.byteLength;
     }
 
-    throw new Error(`HTTP ${response.status} fetching ${this.url}`)
+    throw new Error(`HTTP ${response.status} fetching ${this.url}`);
   }
 
-
-  async readFile(opts: Options = {}) {
-    const { headers = {}, signal } = opts
+  public async readFile(opts: Options = {}) {
+    const { headers = {}, signal } = opts;
     const response = await fetch(this.url, {
-      method: 'GET',
-      redirect: 'follow',
-      mode: 'cors',
-    })
-    return Buffer.from(await response.arrayBuffer())
+      method: "GET",
+      redirect: "follow",
+      mode: "cors"
+    });
+    return Buffer.from(await response.arrayBuffer());
   }
 
-  async stat() {
+  public async stat() {
     if (!this._stat) {
-      const buf = Buffer.allocUnsafe(10)
-      await this.read(buf, 0, 10, 0)
+      const buf = Buffer.allocUnsafe(10);
+      await this.read(buf, 0, 10, 0);
       if (!this._stat)
-        throw new Error(`unable to determine size of file at ${this.url}`)
+        throw new Error(`unable to determine size of file at ${this.url}`);
     }
-    return this._stat
+    return this._stat;
   }
 }
 
-module.exports = RemoteFile
+module.exports = RemoteFile;

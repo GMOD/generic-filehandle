@@ -41,9 +41,7 @@ describe('remote file tests', () => {
   it('reads remote partially', async () => {
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(3)
-    console.log('herhehre',buf)
     const bytesRead = await f.read(buf, 0, 3, 0)
-    console.log('herhehre',bytesRead)
     expect(buf.toString()).toEqual('tes')
     expect(bytesRead).toEqual(3)
   })

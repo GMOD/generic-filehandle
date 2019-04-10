@@ -23,8 +23,7 @@ export default class LocalFile implements Filehandle {
     buffer: Buffer,
     offset: number = 0,
     length: number,
-    position: number,
-    abortSignal?: AbortSignal
+    position: number
   ): Promise<number> {
     let readPosition = position;
     if (readPosition === null) {
