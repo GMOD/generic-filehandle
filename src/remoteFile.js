@@ -1,4 +1,4 @@
-const fetch = require('cross-fetch')
+require('cross-fetch/polyfill')
 const BufferCache = require('./bufferCache')
 
 class RemoteFile {
