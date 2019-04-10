@@ -1,3 +1,7 @@
+## [1.0.2](https://github.com/cmdcolin/node-filehandle/compare/v1.0.1...v1.0.2) (2019-04-10)
+
+
+
 - Fix usage of fetch headers
 - Add overrides parameter to options
 
