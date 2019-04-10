@@ -1,4 +1,4 @@
-import { LocalFile,open, fromUrl } from "../src/";
+import { LocalFile, open, fromUrl } from "../src/";
 
 describe("test util functions", () => {
   it("fromUrl", async () => {
@@ -10,7 +10,7 @@ describe("test util functions", () => {
     expect(ret.constructor.name).toEqual("RemoteFile");
   });
   it("open", async () => {
-    const f = new LocalFile('/var')
+    const f = new LocalFile("/var");
     expect(open("http://google.com").constructor.name).toEqual("RemoteFile");
     expect(open(undefined, "/var/").constructor.name).toEqual("LocalFile");
     expect(open(undefined, undefined, f).constructor.name).toEqual("LocalFile");

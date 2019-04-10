@@ -1,1 +1,1 @@
-declare module 'es6-promisify'
+declare module "es6-promisify";

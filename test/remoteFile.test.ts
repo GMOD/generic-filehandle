@@ -1,14 +1,14 @@
 import fetchMock from "fetch-mock";
 import { LocalFile, RemoteFile } from "../src/";
-import rangeParser from 'range-parser'
+import rangeParser from "range-parser";
 fetchMock.config.sendAsJson = false;
 
-const getFile = (url:string) =>
+const getFile = (url: string) =>
   new LocalFile(require.resolve(url.replace("http://fakehost/", "./data/")));
 // fakes server responses from local file object with fetchMock
-const readBuffer = async (url:string, args:any) => {
+const readBuffer = async (url: string, args: any) => {
   const file = getFile(url);
-  const range = rangeParser(10000,args.range)
+  const range = rangeParser(10000, args.range);
   // @ts-ignore
   const { start, end } = range[0];
   const len = end - start;
@@ -23,7 +23,7 @@ const readBuffer = async (url:string, args:any) => {
   };
 };
 
-const readFile = async (url:string) => {
+const readFile = async (url: string) => {
   const file = getFile(url);
   const ret = await file.readFile();
   return {
@@ -68,7 +68,7 @@ describe("remote file tests", () => {
   it("throws error", async () => {
     fetchMock.mock("http://fakehost/test.txt", 500);
     const f = new RemoteFile("http://fakehost/test.txt");
-    const buf = Buffer.alloc(10)
+    const buf = Buffer.alloc(10);
     const res = f.read(buf, 0, 0, 0);
     await expect(res).rejects.toThrow(/fetching/);
   });
