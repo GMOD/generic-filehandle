@@ -1,11 +1,9 @@
 import "cross-fetch/polyfill";
 
 class RemoteFile implements Filehandle {
-  private position: number;
   private url: string;
 
   public constructor(source) {
-    this.position = 0;
     this.url = source;
   }
 
@@ -45,7 +43,6 @@ class RemoteFile implements Filehandle {
       if (sizeMatch && sizeMatch[1])
         this._stat = { size: parseInt(sizeMatch[1], 10) };
 
-      this.position += resp.byteLength;
       return resp.byteLength; // bytes read
     }
 

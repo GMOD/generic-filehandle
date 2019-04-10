@@ -23,13 +23,8 @@ export default class LocalFile implements Filehandle {
     buffer: Buffer,
     offset: number = 0,
     length: number,
-    position: number
+    position: number = 0
   ): Promise<number> {
-    let readPosition = position;
-    if (readPosition === null) {
-      readPosition = this.position;
-      this.position += length;
-    }
     const ret = await fsRead(await this.fd, buffer, offset, length, position);
     if (typeof ret === "object") return ret.bytesRead;
     return ret;
