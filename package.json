@@ -37,7 +37,7 @@
     "abortable-promise-cache": "^1.0.1",
     "cross-fetch": "^3.0.2",
     "es6-promisify": "^6.0.1",
-    "quick-lru": "^4.0.0"
+    "quick-lru": "^2.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
