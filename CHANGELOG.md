@@ -1,3 +1,5 @@
+- Republish
+
 ## [1.0.3](https://github.com/cmdcolin/node-filehandle/compare/v1.0.2...v1.0.3) (2019-04-11)
 
 
