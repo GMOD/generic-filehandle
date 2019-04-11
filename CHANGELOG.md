@@ -1,3 +1,7 @@
+## [1.0.4](https://github.com/cmdcolin/node-filehandle/compare/v1.0.2...v1.0.4) (2019-04-11)
+
+
+
 - Add @types/node for typescript
 
 ## [1.0.3](https://github.com/cmdcolin/node-filehandle/compare/v1.0.2...v1.0.3) (2019-04-11)
