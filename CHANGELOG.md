@@ -1,3 +1,5 @@
+- Add documentation about the Options object
+
 ## [1.0.5](https://github.com/cmdcolin/generic-filehandle/compare/v1.0.4...v1.0.5) (2019-04-12)
 
 
