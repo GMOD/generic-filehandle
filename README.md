@@ -16,7 +16,7 @@ Implements the concept of a filehandle that can be used to access local files, r
     // operate on a remote file path
     const remote = new RemoteFile('http://somesite.com/file.txt')
     
-    // opterates on blob objects, handy for browsers
+    // operate on blob objects
     const blobfile = new BlobFile(new Blob([some_existing_buffer], { type: "text/plain" }))
 
     // read slice of file, works on remote files with range request, pre-allocate buffer
