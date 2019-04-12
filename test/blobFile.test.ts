@@ -10,6 +10,18 @@ describe("blob filehandle", () => {
     const fileContents = await blobFile.readFile();
     expect(fileContents.toString()).toEqual("testing\n");
   });
+  it("reads whole file with encoding", async () => {
+    const fileBuf = fs.readFileSync(require.resolve("./data/test.txt"));
+    const blob = new Blob([fileBuf], { type: "text/plain" });
+    const blobFile = new BlobFile(blob);
+    const fileContents = await blobFile.readFile("utf8");
+    expect(fileContents).toEqual("testing\n");
+    const fileContents2 = await blobFile.readFile({ encoding: "utf8" });
+    expect(fileContents2).toEqual("testing\n");
+    await expect(blobFile.readFile("fakeEncoding")).rejects.toThrow(
+      /unsupported encoding/
+    );
+  });
   it("reads file part", async () => {
     const fileBuf = fs.readFileSync(require.resolve("./data/test.txt"));
     const blob = new Blob([fileBuf], { type: "text/plain" });
@@ -18,6 +30,15 @@ describe("blob filehandle", () => {
     const bytesRead = await blobFile.read(buf, 0, 3, 0);
     expect(buf.toString()).toEqual("tes");
     expect(bytesRead).toEqual(3);
+  });
+  it("reads zero length file part", async () => {
+    const fileBuf = fs.readFileSync(require.resolve("./data/test.txt"));
+    const blob = new Blob([fileBuf], { type: "text/plain" });
+    const blobFile = new BlobFile(blob);
+    const buf = Buffer.allocUnsafe(3);
+    const bytesRead = await blobFile.read(buf, 0, 0, 0);
+    expect(buf.slice(0, bytesRead).toString()).toEqual("");
+    expect(bytesRead).toEqual(0);
   });
   it("reads file part clipped at end", async () => {
     const fileBuf = fs.readFileSync(require.resolve("./data/test.txt"));

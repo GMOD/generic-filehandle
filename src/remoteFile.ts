@@ -55,7 +55,19 @@ export default class RemoteFile implements Filehandle {
     throw new Error(`HTTP ${response.status} fetching ${this.url}`);
   }
 
-  public async readFile(opts: Options = {}): Promise<Buffer> {
+  public async readFile(
+    options: Options | string = {}
+  ): Promise<Buffer | string> {
+    let encoding;
+    let opts;
+    if (typeof options === "string") {
+      encoding = options;
+      opts = {};
+    } else {
+      encoding = options.encoding;
+      opts = options;
+      delete opts.encoding;
+    }
     const { headers = {}, signal, overrides = {} } = opts;
     const response = await fetch(this.url, {
       headers,
@@ -65,6 +77,8 @@ export default class RemoteFile implements Filehandle {
       signal,
       ...overrides
     });
+    if (encoding === "utf8") return response.text();
+    if (encoding) throw new Error(`unsupported encoding: ${encoding}`);
     return Buffer.from(await response.arrayBuffer());
   }
 
