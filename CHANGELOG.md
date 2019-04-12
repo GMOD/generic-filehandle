@@ -1,3 +1,7 @@
+## [1.0.5](https://github.com/cmdcolin/generic-filehandle/compare/v1.0.4...v1.0.5) (2019-04-12)
+
+
+
 - Added BlobFile class, implementation (thanks @garrettjstevens!)
 
 ## [1.0.4](https://github.com/cmdcolin/node-filehandle/compare/v1.0.2...v1.0.4) (2019-04-11)
