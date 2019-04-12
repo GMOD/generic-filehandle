@@ -1,6 +1,7 @@
 import * as url from "url";
 import LocalFile from "./localFile";
 import RemoteFile from "./remoteFile";
+import BlobFile from "./blobFile";
 
 function fromUrl(source: string): Filehandle {
   const { protocol, pathname } = url.parse(source);
@@ -20,4 +21,4 @@ function open(
   throw new Error("no url, path, or filehandle provided, cannot open");
 }
 
-export { open, fromUrl, RemoteFile, LocalFile };
+export { open, fromUrl, RemoteFile, LocalFile, BlobFile };
