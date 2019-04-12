@@ -29,22 +29,31 @@ Implements the concept of a filehandle that can be used to access local files, r
 
 ## API
 
-### async read(buf:Buffer, offset: number, length: number, position: number): Promise<number>
+### async read(buf:Buffer, offset: number=0, length: number, position: number=0, opts?: Options): Promise<number>
 
 * buf - a pre-allocated buffer that can contain length bytes
 * offset - an offset into the buffer to write into
 * length - a length of data to read
 * position - the byte offset in the file to read from
+* opts - a Options object
 
 Returns a promise containing bytesRead, and the results in the argument `buf`
 
-### async readFile(): Promise<Buffer>
+### async readFile(opts?: Options): Promise<Buffer>
 
 Returns a promise to a buffer for the whole file
 
 ### async stat() : Promise<{size: number}>
 
 Returns a promise to a object containing at a minimum the size of the file
+
+### Options
+
+The Options object for read and readFile can contain abort signal or other customizations. By default these are used
+
+* signal - an AbortSignal that is passed to remote file fetch() API or other file readers
+* headers - extra HTTP headers to pass to remote file fetch() API
+* overrides - extra parameters to pass to the remote file fetch() API
 
 
 ## References
