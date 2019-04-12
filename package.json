@@ -2,6 +2,7 @@
   "name": "generic-filehandle",
   "version": "1.0.4",
   "main": "dist/index.js",
+  "repository": "cmdcolin/generic-filehandle",
   "license": "MIT",
   "author": {
     "name": "Colin Diesh",
