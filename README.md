@@ -1,20 +1,23 @@
 # generic-filehandle
 
 
-[![Build Status](https://travis-ci.com/cmdcolin/node-filehandle.svg?branch=master)](https://travis-ci.com/cmdcolin/node-filehandle)
-[![codecov](https://codecov.io/gh/cmdcolin/node-filehandle/branch/master/graph/badge.svg)](https://codecov.io/gh/cmdcolin/node-filehandle)
+[![Build Status](https://travis-ci.com/cmdcolin/generic-filehandle.svg?branch=master)](https://travis-ci.com/cmdcolin/generic-filehandle)
+[![codecov](https://codecov.io/gh/cmdcolin/generic-filehandle/branch/master/graph/badge.svg)](https://codecov.io/gh/cmdcolin/generic-filehandle)
 
-Implements the concept of a filehandle that can be used to access local or remote files
+Implements the concept of a filehandle that can be used to access local files, remote urls, or blob objects
 
 ## Usage
 
-    import {LocalFile,RemoteFile} from 'generic-filehandle'
+    import {LocalFile,RemoteFile,BlobFile} from 'generic-filehandle'
 
     // operate on a local file path
     const local = new LocalFile('/some/file/path/file.txt')
 
     // operate on a remote file path
     const remote = new RemoteFile('http://somesite.com/file.txt')
+    
+    // opterates on blob objects, handy for browsers
+    const blobfile = new BlobFile(new Blob([some_existing_buffer], { type: "text/plain" }))
 
     // read slice of file, works on remote files with range request, pre-allocate buffer
     const buf = Buffer.alloc(10)
