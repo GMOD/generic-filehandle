@@ -2,8 +2,8 @@
 
 
 [![NPM version](https://img.shields.io/npm/v/generic-filehandle.svg?style=flat-square)](https://npmjs.org/package/generic-filehandle)
-[![Build Status](https://travis-ci.com/cmdcolin/generic-filehandle.svg?branch=master)](https://travis-ci.com/cmdcolin/generic-filehandle)
-[![codecov](https://codecov.io/gh/cmdcolin/generic-filehandle/branch/master/graph/badge.svg)](https://codecov.io/gh/cmdcolin/generic-filehandle)
+[![Build Status](https://travis-ci.com/GMOD/generic-filehandle.svg?branch=master)](https://travis-ci.com/GMOD/generic-filehandle)
+[![codecov](https://codecov.io/gh/GMOD/generic-filehandle/branch/master/graph/badge.svg)](https://codecov.io/gh/GMOD/generic-filehandle)
 
 Implements the concept of a filehandle that can be used to access local files, remote urls, or blob objects
 
