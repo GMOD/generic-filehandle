@@ -2,6 +2,7 @@ declare interface Options {
   signal?: AbortSignal;
   headers?: any;
   overrides?: any;
+  encoding?: string | null;
 }
 
 declare interface Filehandle {
@@ -12,5 +13,5 @@ declare interface Filehandle {
     position: number,
     opts?: Options
   ): Promise<number>;
-  readFile(): Promise<Buffer>;
+  readFile(options?: Options): Promise<Buffer | string>;
 }

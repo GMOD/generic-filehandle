@@ -16,7 +16,7 @@ Implements the concept of a filehandle that can be used to access local files, r
 
     // operate on a remote file path
     const remote = new RemoteFile('http://somesite.com/file.txt')
-    
+
     // operate on blob objects
     const blobfile = new BlobFile(new Blob([some_existing_buffer], { type: "text/plain" }))
 
@@ -40,9 +40,9 @@ Implements the concept of a filehandle that can be used to access local files, r
 
 Returns a promise containing bytesRead, and the results in the argument `buf`
 
-### async readFile(opts?: Options): Promise<Buffer>
+### async readFile(opts?: Options): Promise<Buffer | string>
 
-Returns a promise to a buffer for the whole file
+Returns a promise to a buffer or string for the whole file
 
 ### async stat() : Promise<{size: number}>
 
@@ -50,12 +50,18 @@ Returns a promise to a object containing at a minimum the size of the file
 
 ### Options
 
-The Options object for read and readFile can contain abort signal or other customizations. By default these are used
+The Options object for `read` and `readFile` can contain abort signal or other customizations. By default these are used
 
 * signal - an AbortSignal that is passed to remote file fetch() API or other file readers
 * headers - extra HTTP headers to pass to remote file fetch() API
 * overrides - extra parameters to pass to the remote file fetch() API
 
+The Options object for `readFile` can also contain an entry `encoding`. The
+default is no encoding, in which case the file contents are returned as a
+buffer. Currently, the only encoding that is consistent is "utf8", and
+specifying that will cause the file contents to be returned as a string. Also,
+passing the string "utf8" instead of an Options object is valid for `readFile`
+as well.
 
 ## References
 

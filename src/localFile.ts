@@ -27,8 +27,8 @@ export default class LocalFile implements Filehandle {
     return ret;
   }
 
-  public async readFile(): Promise<Buffer> {
-    return fsReadFile(this.filename);
+  public async readFile(options?: Options | string): Promise<Buffer | string> {
+    return fsReadFile(this.filename, options);
   }
   // todo memoize
   public async stat(): Promise<any> {

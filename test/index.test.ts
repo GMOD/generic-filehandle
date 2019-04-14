@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { LocalFile, open, fromUrl } from "../src/";
 
 describe("test util functions", () => {

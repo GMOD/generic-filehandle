@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import fetchMock from "fetch-mock";
 import { LocalFile, RemoteFile } from "../src/";
 import rangeParser from "range-parser";
@@ -40,6 +41,17 @@ describe("remote file tests", () => {
     const f = new RemoteFile("http://fakehost/test.txt");
     const b = await f.readFile();
     expect(b.toString()).toEqual("testing\n");
+  });
+  it("reads file with encoding", async () => {
+    fetchMock.mock("http://fakehost/test.txt", readFile);
+    const f = new RemoteFile("http://fakehost/test.txt");
+    const fileText = await f.readFile("utf8");
+    expect(fileText).toEqual("testing\n");
+    const fileText2 = await f.readFile({ encoding: "utf8" });
+    expect(fileText2).toEqual("testing\n");
+    await expect(f.readFile("fakeEncoding")).rejects.toThrow(
+      /unsupported encoding/
+    );
   });
   it("reads remote partially", async () => {
     fetchMock.mock("http://fakehost/test.txt", readBuffer);
