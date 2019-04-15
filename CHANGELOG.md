@@ -1,4 +1,5 @@
-- Add documentation about the Options object
+- Added documentation about the Options object
+- Added encoding option to the Options for readFile which can return text if specified as utf8 or you can also directly call filehandle.readFile('utf8')
 
 ## [1.0.5](https://github.com/cmdcolin/generic-filehandle/compare/v1.0.4...v1.0.5) (2019-04-12)
 
