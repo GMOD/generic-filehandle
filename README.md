@@ -9,6 +9,7 @@ Implements the concept of a filehandle that can be used to access local files, r
 
 ## Usage
 
+```js
     import {LocalFile,RemoteFile,BlobFile} from 'generic-filehandle'
 
     // operate on a local file path
@@ -27,6 +28,7 @@ Implements the concept of a filehandle that can be used to access local files, r
 
     // readFile, returns buffer
     const buf = remote.readFile()
+```
 
 ## API
 
