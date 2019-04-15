@@ -1,13 +1,8 @@
-import * as url from "url";
 import LocalFile from "./localFile";
 import RemoteFile from "./remoteFile";
 import BlobFile from "./blobFile";
 
 function fromUrl(source: string): Filehandle {
-  const { protocol, pathname } = url.parse(source);
-  if (protocol === "file:") {
-    return new LocalFile(decodeURI(pathname || ""));
-  }
   return new RemoteFile(source);
 }
 function open(
