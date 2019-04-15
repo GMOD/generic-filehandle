@@ -4,7 +4,7 @@ import { LocalFile, open, fromUrl } from "../src/";
 describe("test util functions", () => {
   it("fromUrl", async () => {
     const ret = fromUrl("file:///var/");
-    expect(ret.constructor.name).toEqual("LocalFile");
+    expect(ret.constructor.name).toEqual("RemoteFile");
   });
   it("fromUrl local", async () => {
     const ret = fromUrl("http://google.com");
