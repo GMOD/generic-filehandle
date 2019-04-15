@@ -34,7 +34,6 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.4.3",
-    "cross-fetch": "^3.0.2",
     "es6-promisify": "^6.0.1",
     "file-uri-to-path": "^1.0.0"
   },
@@ -53,6 +52,7 @@
     "@typescript-eslint/parser": "^1.6.0",
     "babel-eslint": "^10.0.1",
     "babel-preset-typescript": "^7.0.0-alpha.19",
+    "cross-fetch": "^3.0.2",
     "documentation": "^9.3.1",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",

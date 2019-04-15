@@ -37,8 +37,10 @@ describe("remote file tests", () => {
   afterEach(() => fetchMock.restore());
 
   it("reads file", async () => {
-    fetchMock.mock("http://fakehost/test.txt", readFile);
-    const f = new RemoteFile("http://fakehost/test.txt");
+    const fetch = fetchMock
+      .sandbox()
+      .mock("http://fakehost/test.txt", readFile);
+    const f = new RemoteFile("http://fakehost/test.txt", { fetch });
     const b = await f.readFile();
     expect(b.toString()).toEqual("testing\n");
   });

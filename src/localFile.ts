@@ -12,7 +12,7 @@ const fsReadFile = fs && promisify(fs.readFile);
 export default class LocalFile implements Filehandle {
   private fd?: any;
   private filename: string;
-  public constructor(source: string) {
+  public constructor(source: string, opts: Options = {}) {
     this.filename = source;
   }
 
