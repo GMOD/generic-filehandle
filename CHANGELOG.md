@@ -1,3 +1,7 @@
+## [1.0.6](https://github.com/GMOD/generic-filehandle/compare/v1.0.5...v1.0.6) (2019-04-15)
+
+
+
 - Added documentation about the Options object
 - Added encoding option to the Options for readFile which can return text if specified as utf8 or you can also directly call filehandle.readFile('utf8')
 
