@@ -1,4 +1,6 @@
+import url from "url";
 import "cross-fetch/polyfill";
+import { LocalFile } from ".";
 
 interface Stats {
   size: number;
@@ -9,6 +11,16 @@ export default class RemoteFile implements Filehandle {
 
   public constructor(source: string) {
     this.url = source;
+
+    // if it is a file URL, monkey-patch ourselves to act like a LocalFile
+    if (source.startsWith("file://")) {
+      const { path } = url.parse(source);
+      if (!path) throw new TypeError("invalid file url");
+      const localFile = new LocalFile(path);
+      this.read = localFile.read.bind(localFile);
+      this.readFile = localFile.readFile.bind(localFile);
+      this.stat = localFile.stat.bind(localFile);
+    }
   }
 
   public async read(
