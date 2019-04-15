@@ -1,4 +1,4 @@
-import uri2path from 'file-uri-to-path'
+import uri2path from "file-uri-to-path";
 import "cross-fetch/polyfill";
 import { LocalFile } from ".";
 
