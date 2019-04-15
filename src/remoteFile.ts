@@ -1,4 +1,4 @@
-import url from "url";
+import uri2path from 'file-uri-to-path'
 import "cross-fetch/polyfill";
 import { LocalFile } from ".";
 
@@ -14,7 +14,7 @@ export default class RemoteFile implements Filehandle {
 
     // if it is a file URL, monkey-patch ourselves to act like a LocalFile
     if (source.startsWith("file://")) {
-      const { path } = url.parse(source);
+      const path = uri2path(source);
       if (!path) throw new TypeError("invalid file url");
       const localFile = new LocalFile(path);
       this.read = localFile.read.bind(localFile);
