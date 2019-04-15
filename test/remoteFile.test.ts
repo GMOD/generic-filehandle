@@ -84,6 +84,15 @@ describe("remote file tests", () => {
     const res = f.read(buf, 0, 0, 0);
     await expect(res).rejects.toThrow(/fetching/);
   });
+  it("zero read", async () => {
+    fetchMock.mock("http://fakehost/test.txt", readBuffer);
+    const f = new RemoteFile("http://fakehost/test.txt");
+    const buf = Buffer.alloc(10);
+    const bytesRead = await f.read(buf, 0, 0, 0);
+    expect(buf.toString().length).toBe(10);
+    expect(buf.toString()[0]).toBe("\0");
+    expect(bytesRead).toEqual(0);
+  });
   it("stat", async () => {
     fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");

@@ -23,7 +23,14 @@ export default class LocalFile implements Filehandle {
     length: number,
     position: number = 0
   ): Promise<number> {
-    const ret = await fsRead(await this.fd, buffer, offset, length, position);
+    const fetchLength = Math.min(buffer.length - offset, length);
+    const ret = await fsRead(
+      await this.fd,
+      buffer,
+      offset,
+      fetchLength,
+      position
+    );
     return ret;
   }
 
