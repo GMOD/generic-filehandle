@@ -15,6 +15,7 @@ export default class RemoteFile implements Filehandle {
   private url: string;
   private _stat?: Stats;
   private fetch: Function;
+  private baseOverrides: any = {};
 
   public constructor(source: string, opts: Options = {}) {
     this.url = source;
@@ -36,6 +37,9 @@ export default class RemoteFile implements Filehandle {
       throw new TypeError(
         `no fetch function supplied, and none found in global environment`
       );
+    }
+    if (opts.overrides) {
+      this.baseOverrides = opts.overrides;
     }
     this.fetch = fetch;
   }
@@ -60,6 +64,7 @@ export default class RemoteFile implements Filehandle {
       redirect: "follow",
       mode: "cors",
       signal,
+      ...this.baseOverrides,
       ...overrides
     });
 
@@ -104,6 +109,7 @@ export default class RemoteFile implements Filehandle {
       redirect: "follow",
       mode: "cors",
       signal,
+      ...this.baseOverrides,
       ...overrides
     });
     if (response.status !== 200) {
