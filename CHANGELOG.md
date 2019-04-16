@@ -1,3 +1,8 @@
+- Remove polyfill of fetch, now uses "globalThis" fetch or supply opts.fetch to the constructor of RemoteFile (@rbuels, pull #8)
+- Translates file:// URL to LocalFile in the implementation (@rbuels, pull #7)
+- Allow adding fetch overrides to the constructor of RemoteFile
+- Make LocalFile lazily evaluate opening the file until usage
+
 ## [1.0.6](https://github.com/GMOD/generic-filehandle/compare/v1.0.5...v1.0.6) (2019-04-15)
 
 
