@@ -89,6 +89,14 @@ export default class RemoteFile implements Filehandle {
       signal,
       ...overrides
     });
+    if (response.status !== 200) {
+      throw Object.assign(
+        new Error(`HTTP ${response.status} fetching ${this.url}`),
+        {
+          status: response.status
+        }
+      );
+    }
     if (encoding === "utf8") return response.text();
     if (encoding) throw new Error(`unsupported encoding: ${encoding}`);
     return Buffer.from(await response.arrayBuffer());

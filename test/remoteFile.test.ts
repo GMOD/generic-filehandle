@@ -84,6 +84,13 @@ describe("remote file tests", () => {
     const res = f.read(buf, 0, 0, 0);
     await expect(res).rejects.toThrow(/fetching/);
   });
+  it("throws error if file missing", async () => {
+    fetchMock.mock("http://fakehost/test.txt", 404);
+    const f = new RemoteFile("http://fakehost/test.txt");
+    const buf = Buffer.alloc(10);
+    const res = f.read(buf, 0, 0, 0);
+    await expect(res).rejects.toThrow(/HTTP 404/);
+  });
   it("zero read", async () => {
     fetchMock.mock("http://fakehost/test.txt", readBuffer);
     const f = new RemoteFile("http://fakehost/test.txt");
