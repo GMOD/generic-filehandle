@@ -51,4 +51,10 @@ describe("remote file with file urls", () => {
     const stat = await f.stat();
     expect(stat.size).toEqual(8);
   });
+
+  it("opens nonexistent file but fails on first fetch", async () => {
+    const f = new RemoteFile(`${fileUrlBase}/stairmaster.txt`);
+    const stat = f.stat();
+    await expect(stat).rejects.toThrow(/ENOENT/);
+  });
 });

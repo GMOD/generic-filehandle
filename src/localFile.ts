@@ -10,11 +10,17 @@ const fsFStat = fs && promisify(fs.fstat);
 const fsReadFile = fs && promisify(fs.readFile);
 
 export default class LocalFile implements Filehandle {
-  private fd: any;
+  private fd?: any;
   private filename: string;
   public constructor(source: string) {
     this.filename = source;
-    this.fd = fsOpen(this.filename, "r");
+  }
+
+  private getFd() {
+    if (!this.fd) {
+      this.fd = fsOpen(this.filename, "r");
+    }
+    return this.fd;
   }
 
   public async read(
@@ -25,7 +31,7 @@ export default class LocalFile implements Filehandle {
   ): Promise<number> {
     const fetchLength = Math.min(buffer.length - offset, length);
     const ret = await fsRead(
-      await this.fd,
+      await this.getFd(),
       buffer,
       offset,
       fetchLength,
@@ -39,6 +45,6 @@ export default class LocalFile implements Filehandle {
   }
   // todo memoize
   public async stat(): Promise<any> {
-    return fsFStat(await this.fd);
+    return fsFStat(await this.getFd());
   }
 }
