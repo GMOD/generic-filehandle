@@ -6565,6 +6565,11 @@ tempfile@^1.1.1:
     os-tmpdir "^1.0.0"
     uuid "^2.0.1"
 
+tenacious-fetch@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/tenacious-fetch/-/tenacious-fetch-2.2.2.tgz#1d2cfdcb2eb270d2b5b47b5f0f04d76e6a203203"
+  integrity sha512-DS3GOokfk5p5I7EeUS/FYGBy5r0MwRjjrwTkhOP/CrW8iUGoO5hsV3V8EQdEraDtGDvevPTPj1weRH4qNmzXsA==
+
 test-exclude@^5.0.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-5.1.0.tgz#6ba6b25179d2d38724824661323b73e03c0c1de1"

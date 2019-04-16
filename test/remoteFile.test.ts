@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import fetchMock from "fetch-mock";
 import { LocalFile, RemoteFile } from "../src/";
+import tenaciousFetch from "tenacious-fetch";
+
 import rangeParser from "range-parser";
 fetchMock.config.sendAsJson = false;
 
@@ -36,9 +38,40 @@ const readFile = async (url: string) => {
 describe("remote file tests", () => {
   afterEach(() => fetchMock.restore());
 
+  it("tenacious fetch", async () => {
+    const fetch = fetchMock
+      .sandbox()
+      .mock("http://fakehost/test.txt", readFile);
+    const f = new RemoteFile("http://fakehost/test.txt", {
+      fetch: tenaciousFetch
+    });
+    const b = await f.readFile({ overrides: { fetcher: fetch } });
+    expect(b.toString()).toEqual("testing\n");
+  });
+  it("tenacious fetch with 404", async () => {
+    const fetch = fetchMock.sandbox().mock("http://fakehost/test.txt", 404);
+    const f = new RemoteFile("http://fakehost/test.txt", {
+      fetch: tenaciousFetch
+    });
+    const res = f.readFile({ overrides: { fetcher: fetch, retries: 0 } });
+    await expect(res).rejects.toThrow(/HTTP 404/);
+  });
+  it("tenacious fetch base overrides", async () => {
+    const fetch = fetchMock
+      .sandbox()
+      .mock("http://fakehost/test.txt", readFile);
+    const f = new RemoteFile("http://fakehost/test.txt", {
+      fetch: tenaciousFetch,
+      overrides: { fetcher: fetch, retries: 0 }
+    });
+    const b = await f.readFile();
+    expect(b.toString()).toEqual("testing\n");
+  });
   it("reads file", async () => {
-    fetchMock.mock("http://fakehost/test.txt", readFile);
-    const f = new RemoteFile("http://fakehost/test.txt");
+    const fetch = fetchMock
+      .sandbox()
+      .mock("http://fakehost/test.txt", readFile);
+    const f = new RemoteFile("http://fakehost/test.txt", { fetch });
     const b = await f.readFile();
     expect(b.toString()).toEqual("testing\n");
   });

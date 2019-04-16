@@ -1,6 +1,12 @@
 import uri2path from "file-uri-to-path";
-import "cross-fetch/polyfill";
 import { LocalFile } from ".";
+
+const myGlobal =
+  typeof window !== "undefined"
+    ? window
+    : typeof self !== "undefined"
+    ? self
+    : { fetch: undefined };
 
 interface Stats {
   size: number;
@@ -8,8 +14,10 @@ interface Stats {
 export default class RemoteFile implements Filehandle {
   private url: string;
   private _stat?: Stats;
+  private fetch: Function;
+  private baseOverrides: any = {};
 
-  public constructor(source: string) {
+  public constructor(source: string, opts: Options = {}) {
     this.url = source;
 
     // if it is a file URL, monkey-patch ourselves to act like a LocalFile
@@ -20,7 +28,20 @@ export default class RemoteFile implements Filehandle {
       this.read = localFile.read.bind(localFile);
       this.readFile = localFile.readFile.bind(localFile);
       this.stat = localFile.stat.bind(localFile);
+      this.fetch = () => {};
+      return;
     }
+
+    const fetch = opts.fetch || myGlobal.fetch;
+    if (!fetch) {
+      throw new TypeError(
+        `no fetch function supplied, and none found in global environment`
+      );
+    }
+    if (opts.overrides) {
+      this.baseOverrides = opts.overrides;
+    }
+    this.fetch = fetch;
   }
 
   public async read(
@@ -37,12 +58,13 @@ export default class RemoteFile implements Filehandle {
       headers.range = `bytes=${position}-`;
     }
 
-    const response = await fetch(this.url, {
+    const response = await this.fetch(this.url, {
       headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
       signal,
+      ...this.baseOverrides,
       ...overrides
     });
 
@@ -81,12 +103,13 @@ export default class RemoteFile implements Filehandle {
       delete opts.encoding;
     }
     const { headers = {}, signal, overrides = {} } = opts;
-    const response = await fetch(this.url, {
+    const response = await this.fetch(this.url, {
       headers,
       method: "GET",
       redirect: "follow",
       mode: "cors",
       signal,
+      ...this.baseOverrides,
       ...overrides
     });
     if (response.status !== 200) {
