@@ -1,6 +1,6 @@
 {
   "name": "generic-filehandle",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/index.js",
   "repository": "GMOD/generic-filehandle",
   "license": "MIT",
