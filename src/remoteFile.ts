@@ -27,8 +27,8 @@ export default class RemoteFile implements Filehandle {
       this.read = localFile.read.bind(localFile);
       this.readFile = localFile.readFile.bind(localFile);
       this.stat = localFile.stat.bind(localFile);
-      this.fetch = () => {}
-      return
+      this.fetch = () => {};
+      return;
     }
 
     const fetch = opts.fetch || myGlobal.fetch;
