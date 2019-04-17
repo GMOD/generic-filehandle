@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "es2017",
-      "esnext.array",
-      "dom"
-    ],
+    "target": "es6",
     "module": "commonjs",
-    "declaration": true,
-    "noEmit": true,
+    "moduleResolution": "node",
     "outDir": "./dist",
     "strict": true,
     "removeComments": false,
-    "allowSyntheticDefaultImports": true
-  }
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src"
+  ]
 }

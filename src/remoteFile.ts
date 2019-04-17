@@ -1,4 +1,5 @@
 import uri2path from "file-uri-to-path";
+import { GenericFilehandle, FilehandleOptions } from "./filehandle";
 import { LocalFile } from ".";
 
 const myGlobal =
@@ -11,13 +12,13 @@ const myGlobal =
 interface Stats {
   size: number;
 }
-export default class RemoteFile implements Filehandle {
+export default class RemoteFile implements GenericFilehandle {
   private url: string;
   private _stat?: Stats;
   private fetch: Function;
   private baseOverrides: any = {};
 
-  public constructor(source: string, opts: Options = {}) {
+  public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source;
 
     // if it is a file URL, monkey-patch ourselves to act like a LocalFile
@@ -49,7 +50,7 @@ export default class RemoteFile implements Filehandle {
     offset = 0,
     length: number,
     position = 0,
-    opts: Options = {}
+    opts: FilehandleOptions = {}
   ): Promise<number> {
     const { headers = {}, signal, overrides = {} } = opts;
     if (length < Infinity) {
@@ -90,7 +91,7 @@ export default class RemoteFile implements Filehandle {
   }
 
   public async readFile(
-    options: Options | string = {}
+    options: FilehandleOptions | string = {}
   ): Promise<Buffer | string> {
     let encoding;
     let opts;

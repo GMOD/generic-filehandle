@@ -2,6 +2,7 @@
   "name": "generic-filehandle",
   "version": "1.0.7",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "GMOD/generic-filehandle",
   "license": "MIT",
   "author": {
@@ -21,7 +22,9 @@
     "lint": "eslint --ext .ts src test",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "build": "tsc && babel ./src --out-dir dist --extensions '.ts'",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
+    "build": "npm run build:types && npm run build:js",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
     "postpublish": "git push origin master --follow-tags"

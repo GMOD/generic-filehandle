@@ -1,3 +1,5 @@
+- Properly added typescript type declaration files to the distribution
+
 ## [1.0.7](https://github.com/GMOD/generic-filehandle/compare/v1.0.6...v1.0.7) (2019-04-16)
 
 

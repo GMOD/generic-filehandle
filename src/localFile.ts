@@ -1,4 +1,5 @@
 import { promisify } from "es6-promisify";
+import { GenericFilehandle, FilehandleOptions } from "./filehandle";
 declare var __webpack_require__: any; // eslint-disable-line @typescript-eslint/camelcase
 
 // don't load fs native module if running in webpacked code
@@ -9,10 +10,10 @@ const fsRead = fs && promisify(fs.read);
 const fsFStat = fs && promisify(fs.fstat);
 const fsReadFile = fs && promisify(fs.readFile);
 
-export default class LocalFile implements Filehandle {
+export default class LocalFile implements GenericFilehandle {
   private fd?: any;
   private filename: string;
-  public constructor(source: string, opts: Options = {}) {
+  public constructor(source: string, opts: FilehandleOptions = {}) {
     this.filename = source;
   }
 
@@ -40,7 +41,9 @@ export default class LocalFile implements Filehandle {
     return ret;
   }
 
-  public async readFile(options?: Options | string): Promise<Buffer | string> {
+  public async readFile(
+    options?: FilehandleOptions | string
+  ): Promise<Buffer | string> {
     return fsReadFile(this.filename, options);
   }
   // todo memoize

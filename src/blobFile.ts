@@ -1,3 +1,4 @@
+import { GenericFilehandle, FilehandleOptions } from "./filehandle";
 interface Stats {
   size: number;
 }
@@ -58,7 +59,7 @@ function readBlobAsText(blob: Blob): Promise<string> {
  * Adapted by Robert Buels and Garrett Stevens from the BlobFetchable object in
  * the Dalliance Genome Explorer, which is copyright Thomas Down 2006-2011.
  */
-export default class BlobFile implements Filehandle {
+export default class BlobFile implements GenericFilehandle {
   private blob: Blob;
   private size: number;
   public constructor(blob: Blob) {
@@ -89,7 +90,9 @@ export default class BlobFile implements Filehandle {
     return result.byteLength;
   }
 
-  public async readFile(options?: Options | string): Promise<Buffer | string> {
+  public async readFile(
+    options?: FilehandleOptions | string
+  ): Promise<Buffer | string> {
     let encoding;
     if (typeof options === "string") encoding = options;
     else encoding = options && options.encoding;

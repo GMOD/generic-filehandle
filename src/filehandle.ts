@@ -1,4 +1,4 @@
-declare interface Options {
+export interface FilehandleOptions {
   /**
    * optional AbortSignal object for aborting the request
    */
@@ -14,13 +14,13 @@ declare interface Options {
   fetch?: Function;
 }
 
-declare interface Filehandle {
+export interface GenericFilehandle {
   read(
     buf: Buffer,
     offset: number,
     length: number,
     position: number,
-    opts?: Options
+    opts?: FilehandleOptions
   ): Promise<number>;
-  readFile(options?: Options): Promise<Buffer | string>;
+  readFile(options?: FilehandleOptions): Promise<Buffer | string>;
 }
