@@ -52,11 +52,12 @@ Returns a promise to a object containing at a minimum the size of the file
 
 ### Options
 
-The Options object for `read` and `readFile` can contain abort signal or other customizations. By default these are used
+The Options object for the constructor, `read` and `readFile` can contain abort signal or other customizations. By default these are used
 
 * signal - an AbortSignal that is passed to remote file fetch() API or other file readers
 * headers - extra HTTP headers to pass to remote file fetch() API
 * overrides - extra parameters to pass to the remote file fetch() API
+* fetch - a custom fetch callback, otherwise defaults to the environment (initialized in constructor)
 
 The Options object for `readFile` can also contain an entry `encoding`. The
 default is no encoding, in which case the file contents are returned as a
