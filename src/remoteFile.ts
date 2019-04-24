@@ -29,7 +29,7 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile);
       this.readFile = localFile.readFile.bind(localFile);
       this.stat = localFile.stat.bind(localFile);
-      this.fetch = () => {};
+      this.fetch = (): void => {};
       return;
     }
 
