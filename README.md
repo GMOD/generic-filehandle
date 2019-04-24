@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.com/GMOD/generic-filehandle.svg?branch=master)](https://travis-ci.com/GMOD/generic-filehandle)
 [![codecov](https://codecov.io/gh/GMOD/generic-filehandle/branch/master/graph/badge.svg)](https://codecov.io/gh/GMOD/generic-filehandle)
 
-Implements the concept of a filehandle that can be used to access local files, remote urls, or blob objects
+Provides a uniform interface for accessing binary data from local files, remote HTTP resources, and Blob data in the browser. Implements a subset of the [Node.js v10 promise-based FileHandle API](https://nodejs.org/api/fs.html#fs_class_filehandle).
 
 ## Usage
 
@@ -38,37 +38,35 @@ Implements the concept of a filehandle that can be used to access local files, r
 * offset - an offset into the buffer to write into
 * length - a length of data to read
 * position - the byte offset in the file to read from
-* opts - a Options object
+* opts - optional Options object
 
-Returns a promise containing bytesRead, and the results in the argument `buf`
+Returns a Promise for the number of bytes read, and the data will be copied
+into the Buffer provided in the arguments.
 
 ### async readFile(opts?: Options): Promise<Buffer | string>
 
-Returns a promise to a buffer or string for the whole file
+Returns a Promise for a buffer or string containing the contents of the whole file.
 
 ### async stat() : Promise<{size: number}>
 
-Returns a promise to a object containing at a minimum the size of the file
+Returns a Promise for an object containing as much information about the file as is available. At minimum, the `size` of the file will be present.
 
 ### Options
 
-The Options object for the constructor, `read` and `readFile` can contain abort signal or other customizations. By default these are used
+The Options object for the constructor, `read` and `readFile` can contain abort signal
+to customize behavior. All entries are optional.
 
-* signal - an AbortSignal that is passed to remote file fetch() API or other file readers
-* headers - extra HTTP headers to pass to remote file fetch() API
-* overrides - extra parameters to pass to the remote file fetch() API
-* fetch - a custom fetch callback, otherwise defaults to the environment (initialized in constructor)
+* signal `<AbortSignal>` - an AbortSignal that is passed to remote file fetch() API or other file readers
+* headers `<Object <string, string> >`- extra HTTP headers to pass to remote file fetch() API
+* overrides `<Object>` - extra parameters to pass to the remote file fetch() API
+* fetch `<Function>` - a custom fetch callback, otherwise defaults to the environment (initialized in constructor)
+* encoding `<string>` - if specified, then this function returns a string. Otherwise it returns a buffer. Currently only `utf8` encoding is supported.
 
 The Options object for `readFile` can also contain an entry `encoding`. The
 default is no encoding, in which case the file contents are returned as a
-buffer. Currently, the only encoding that is consistent is "utf8", and
-specifying that will cause the file contents to be returned as a string. Also,
-passing the string "utf8" instead of an Options object is valid for `readFile`
-as well.
+buffer. Currently, the only available encoding is `utf8`, and
+specifying that will cause the file contents to be returned as a string. For compatibility with the Node API, the `readFile` method will accept the string "utf8" instead of an Options object.
 
 ## References
 
-
-Node 10 implements a FileHandle class similar to this that is promisified. This is similar and adds the concept of remote file handle support
-
-See https://nodejs.org/api/fs.html#fs_class_filehandle
+This library implements a subset of the [Node.js v10 promise-based FileHandle API](https://nodejs.org/api/fs.html#fs_class_filehandle).
