@@ -1,1 +1,1 @@
-declare module "tenacious-fetch";
+declare module 'tenacious-fetch'
