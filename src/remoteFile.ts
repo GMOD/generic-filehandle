@@ -83,15 +83,15 @@ export default class RemoteFile implements GenericFilehandle {
     })
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
-      const buf = await this.getBufferFromResponse(response)
-      buf.copy(buffer, offset, 0, Math.min(length, buf.length))
+      const responseData = await this.getBufferFromResponse(response)
+      const bytesCopied = responseData.copy(buffer, offset, 0, Math.min(length, responseData.length))
 
       // try to parse out the size of the remote file
       const res = response.headers.get('content-range')
       const sizeMatch = /\/(\d+)$/.exec(res || '')
       if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
 
-      return buf.length // bytes read
+      return bytesCopied
     }
 
     // TODO: try harder here to gather more information about what the problem is
