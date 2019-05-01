@@ -127,6 +127,20 @@ describe('remote file tests', () => {
     const res = f.read(buf, 0, 0, 0)
     await expect(res).rejects.toThrow(/HTTP 404/)
   })
+  it('throws if response object has no buffer or arrayBuffer', async () => {
+    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const f = new RemoteFile('http://fakehost/test.txt', {
+      async fetch(url, opts) {
+        const res = await mockedFetch(url, opts)
+        res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
+        res.arrayBuffer = 0 // also obscure arrayBuffer
+        return res
+      },
+    })
+    const b = f.readFile()
+    await expect(b).rejects.toThrow(/response object/)
+  })
+
   it('zero read', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
