@@ -48,7 +48,7 @@ export default class RemoteFile implements GenericFilehandle {
       return
     }
 
-    const fetch = opts.fetch || myGlobal.fetch
+    const fetch = opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
     if (!fetch) {
       throw new TypeError(`no fetch function supplied, and none found in global environment`)
     }
