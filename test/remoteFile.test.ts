@@ -105,6 +105,13 @@ describe('remote file tests', () => {
     expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
     expect(bytesRead).toEqual(2)
   })
+  it('reads remote clipped at the end again', async () => {
+    fetchMock.mock('http://fakehost/test.txt', readBuffer)
+    const f = new RemoteFile('http://fakehost/test.txt')
+    const buf = Buffer.allocUnsafe(3)
+    expect(await f.read(buf, 3, 3, 6)).toEqual(0) // test writing fully past end of buf
+    expect(await f.read(buf, 2, 3, 6)).toEqual(1) // test writing partially past end of buf
+  })
   it('length infinity', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
