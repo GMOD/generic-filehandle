@@ -68,6 +68,18 @@ describe('remote file tests', () => {
     const b = await f.readFile()
     expect(b.toString()).toEqual('testing\n')
   })
+  it('reads file with response buffer method disabled', async () => {
+    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const f = new RemoteFile('http://fakehost/test.txt', {
+      async fetch(url, opts) {
+        const res = await mockedFetch(url, opts)
+        res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
+        return res
+      },
+    })
+    const b = await f.readFile()
+    expect(b.toString()).toEqual('testing\n')
+  })
   it('reads file with encoding', async () => {
     fetchMock.mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt')

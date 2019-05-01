@@ -4,6 +4,15 @@ import { LocalFile } from '.'
 
 const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
 
+/**
+ * a fetch response object that might have some additional properties
+ * that come from the underlying fetch implementation, such as the
+ * `buffer` method on node-fetch responses.
+ */
+interface PolyfilledResponse extends Response {
+  buffer: Function | void
+}
+
 interface Stats {
   size: number
 }
@@ -12,6 +21,17 @@ export default class RemoteFile implements GenericFilehandle {
   private _stat?: Stats
   private fetch: Function
   private baseOverrides: any = {}
+
+  private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
+    if (typeof response.buffer === 'function') {
+      return response.buffer()
+    } else if (typeof response.arrayBuffer === 'function') {
+      const resp = await response.arrayBuffer()
+      return Buffer.from(resp)
+    } else {
+      throw new TypeError('invalid HTTP response object, has no buffer method, and no arrayBuffer method')
+    }
+  }
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source
@@ -63,19 +83,18 @@ export default class RemoteFile implements GenericFilehandle {
     })
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
-      const resp = await response.arrayBuffer()
-      const ret = Buffer.from(resp)
-
-      ret.copy(buffer, offset)
+      const buf = await this.getBufferFromResponse(response)
+      buf.copy(buffer, offset, 0, length)
 
       // try to parse out the size of the remote file
       const res = response.headers.get('content-range')
       const sizeMatch = /\/(\d+)$/.exec(res || '')
       if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
 
-      return resp.byteLength // bytes read
+      return buf.length // bytes read
     }
 
+    // TODO: try harder here to gather more information about what the problem is
     throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
@@ -107,7 +126,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
     if (encoding === 'utf8') return response.text()
     if (encoding) throw new Error(`unsupported encoding: ${encoding}`)
-    return Buffer.from(await response.arrayBuffer())
+    return this.getBufferFromResponse(response)
   }
 
   public async stat(): Promise<Stats> {
