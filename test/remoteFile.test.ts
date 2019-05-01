@@ -68,6 +68,18 @@ describe('remote file tests', () => {
     const b = await f.readFile()
     expect(b.toString()).toEqual('testing\n')
   })
+  it('reads file with response buffer method disabled', async () => {
+    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const f = new RemoteFile('http://fakehost/test.txt', {
+      async fetch(url, opts) {
+        const res = await mockedFetch(url, opts)
+        res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
+        return res
+      },
+    })
+    const b = await f.readFile()
+    expect(b.toString()).toEqual('testing\n')
+  })
   it('reads file with encoding', async () => {
     fetchMock.mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt')
@@ -93,6 +105,13 @@ describe('remote file tests', () => {
     expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
     expect(bytesRead).toEqual(2)
   })
+  it('reads remote clipped at the end again', async () => {
+    fetchMock.mock('http://fakehost/test.txt', readBuffer)
+    const f = new RemoteFile('http://fakehost/test.txt')
+    const buf = Buffer.allocUnsafe(3)
+    expect(await f.read(buf, 3, 3, 6)).toEqual(0) // test writing fully past end of buf
+    expect(await f.read(buf, 2, 3, 6)).toEqual(1) // test writing partially past end of buf
+  })
   it('length infinity', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
@@ -115,6 +134,20 @@ describe('remote file tests', () => {
     const res = f.read(buf, 0, 0, 0)
     await expect(res).rejects.toThrow(/HTTP 404/)
   })
+  it('throws if response object has no buffer or arrayBuffer', async () => {
+    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const f = new RemoteFile('http://fakehost/test.txt', {
+      async fetch(url, opts) {
+        const res = await mockedFetch(url, opts)
+        res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
+        res.arrayBuffer = 0 // also obscure arrayBuffer
+        return res
+      },
+    })
+    const b = f.readFile()
+    await expect(b).rejects.toThrow(/response object/)
+  })
+
   it('zero read', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
