@@ -13,11 +13,13 @@ const fsReadFile = fs && promisify(fs.readFile)
 export default class LocalFile implements GenericFilehandle {
   private fd?: any
   private filename: string
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.filename = source
   }
 
-  private getFd() {
+  private getFd(): any {
     if (!this.fd) {
       this.fd = fsOpen(this.filename, 'r')
     }
