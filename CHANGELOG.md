@@ -1,3 +1,7 @@
+## [1.0.9](https://github.com/GMOD/generic-filehandle/compare/v1.0.8...v1.0.9) (2019-05-01)
+
+
+
 - Add ability to read a fetch response's Body().buffer() instead of Body.arrayBuffer() that is normally returned
 - Fix issue with using un-polyfilled fetch
 
