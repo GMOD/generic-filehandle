@@ -65,11 +65,16 @@ export default class BlobFile implements GenericFilehandle {
     this.size = blob.size
   }
 
-  public async read(buffer: Buffer, offset = 0, length: number, position = 0): Promise<number> {
+  public async read(
+    buffer: Buffer,
+    offset = 0,
+    length: number,
+    position = 0,
+  ): Promise<{ bytesRead: number; buffer: Buffer }> {
     // short-circuit a read of 0 bytes here, because browsers actually sometimes
     // crash if you try to read 0 bytes from a local file!
     if (!length) {
-      return 0
+      return { bytesRead: 0, buffer }
     }
 
     const start = position
@@ -80,7 +85,7 @@ export default class BlobFile implements GenericFilehandle {
 
     resultBuffer.copy(buffer, offset)
 
-    return result.byteLength
+    return { bytesRead: result.byteLength, buffer }
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {

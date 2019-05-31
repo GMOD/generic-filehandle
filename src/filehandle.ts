@@ -15,6 +15,12 @@ export interface FilehandleOptions {
 }
 
 export interface GenericFilehandle {
-  read(buf: Buffer, offset: number, length: number, position: number, opts?: FilehandleOptions): Promise<number>
+  read(
+    buf: Buffer,
+    offset: number,
+    length: number,
+    position: number,
+    opts?: FilehandleOptions,
+  ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions): Promise<Buffer | string>
 }

@@ -26,10 +26,15 @@ export default class LocalFile implements GenericFilehandle {
     return this.fd
   }
 
-  public async read(buffer: Buffer, offset: number = 0, length: number, position: number = 0): Promise<number> {
+  public async read(
+    buffer: Buffer,
+    offset: number = 0,
+    length: number,
+    position: number = 0,
+  ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const fetchLength = Math.min(buffer.length - offset, length)
     const ret = await fsRead(await this.getFd(), buffer, offset, fetchLength, position)
-    return ret
+    return { bytesRead: ret, buffer }
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
