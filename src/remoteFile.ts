@@ -64,7 +64,7 @@ export default class RemoteFile implements GenericFilehandle {
     length: number,
     position = 0,
     opts: FilehandleOptions = {},
-  ): Promise<number> {
+  ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const { headers = {}, signal, overrides = {} } = opts
     if (length < Infinity) {
       headers.range = `bytes=${position}-${position + length}`
@@ -91,7 +91,7 @@ export default class RemoteFile implements GenericFilehandle {
       const sizeMatch = /\/(\d+)$/.exec(res || '')
       if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
 
-      return bytesCopied
+      return { bytesRead: bytesCopied, buffer }
     }
 
     // TODO: try harder here to gather more information about what the problem is

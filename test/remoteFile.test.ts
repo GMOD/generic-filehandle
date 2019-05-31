@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+
+//@ts-ignore TODO the @types/fetch-mock is confusing, it does have a default export
 import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
 import tenaciousFetch from 'tenacious-fetch'
 
+//@ts-ignore TODO the @types/range-parser is confusing, it does have a default export
 import rangeParser from 'range-parser'
 fetchMock.config.sendAsJson = false
 
@@ -15,9 +18,9 @@ const readBuffer = async (url: string, args: any) => {
   const { start, end } = range[0]
   const len = end - start
   let buf = Buffer.alloc(len)
-  const bytesRead = await file.read(buf, 0, len, start)
+  const res = await file.read(buf, 0, len, start)
   const stat = await file.stat()
-  buf = buf.slice(0, bytesRead)
+  buf = buf.slice(0, res.bytesRead)
   return {
     status: 206,
     body: buf,
@@ -73,6 +76,7 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
+        //@ts-ignore
         res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
         return res
       },
@@ -93,7 +97,7 @@ describe('remote file tests', () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(3)
-    const bytesRead = await f.read(buf, 0, 3, 0)
+    const { bytesRead } = await f.read(buf, 0, 3, 0)
     expect(buf.toString()).toEqual('tes')
     expect(bytesRead).toEqual(3)
   })
@@ -101,22 +105,22 @@ describe('remote file tests', () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(3)
-    const bytesRead = await f.read(buf, 0, 3, 6)
-    expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
-    expect(bytesRead).toEqual(2)
+    const res = await f.read(buf, 0, 3, 6)
+    expect(buf.slice(0, res.bytesRead).toString()).toEqual('g\n')
+    expect(res.bytesRead).toEqual(2)
   })
   it('reads remote clipped at the end again', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(3)
-    expect(await f.read(buf, 3, 3, 6)).toEqual(0) // test writing fully past end of buf
-    expect(await f.read(buf, 2, 3, 6)).toEqual(1) // test writing partially past end of buf
+    expect((await f.read(buf, 3, 3, 6)).bytesRead).toEqual(0) // test writing fully past end of buf
+    expect((await f.read(buf, 2, 3, 6)).bytesRead).toEqual(1) // test writing partially past end of buf
   })
   it('length infinity', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(5)
-    const bytesRead = await f.read(buf, 0, Infinity, 3)
+    const { bytesRead } = await f.read(buf, 0, Infinity, 3)
     expect(buf.toString()).toEqual('ting\n')
     expect(bytesRead).toEqual(5)
   })
@@ -139,8 +143,9 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
-        res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
-        res.arrayBuffer = 0 // also obscure arrayBuffer
+        //@ts-ignore
+        res.buffer = undefined // obscure the buffer method to test our arraybuffer parse
+        res.arrayBuffer = undefined // also obscure arrayBuffer
         return res
       },
     })
@@ -152,10 +157,10 @@ describe('remote file tests', () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.alloc(10)
-    const bytesRead = await f.read(buf, 0, 0, 0)
+    const res = await f.read(buf, 0, 0, 0)
     expect(buf.toString().length).toBe(10)
     expect(buf.toString()[0]).toBe('\0')
-    expect(bytesRead).toEqual(0)
+    expect(res.bytesRead).toEqual(0)
   })
   it('stat', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
