@@ -22,5 +22,5 @@ export interface GenericFilehandle {
     position: number,
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Buffer }>
-  readFile(options?: FilehandleOptions): Promise<Buffer | string>
+  readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
 }
