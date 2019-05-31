@@ -83,9 +83,9 @@ export default class BlobFile implements GenericFilehandle {
     const result = await readBlobAsArrayBuffer(this.blob.slice(start, end))
     const resultBuffer = Buffer.from(result)
 
-    resultBuffer.copy(buffer, offset)
+    const bytesCopied = resultBuffer.copy(buffer, offset)
 
-    return { bytesRead: result.byteLength, buffer }
+    return { bytesRead: bytesCopied, buffer: resultBuffer }
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {

@@ -26,6 +26,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "build": "npm run build:types && npm run build:js",
+    "watch": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline --watch",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
     "postpublish": "git push origin master --follow-tags"
