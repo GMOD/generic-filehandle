@@ -1,7 +1,7 @@
 {
   "name": "generic-filehandle",
   "description": "uniform interface for accessing binary data from local files, remote HTTP resources, and browser Blob data",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "GMOD/generic-filehandle",

@@ -1,3 +1,7 @@
+# [2.0.0](https://github.com/GMOD/generic-filehandle/compare/v1.0.9...v2.0.0) (2019-06-05)
+
+
+
 - Update to use Node.js return type e.g. {buffer,bytesRead} instead of just bytesRead
 
 ## [1.0.9](https://github.com/GMOD/generic-filehandle/compare/v1.0.8...v1.0.9) (2019-05-01)
