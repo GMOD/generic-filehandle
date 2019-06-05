@@ -23,7 +23,7 @@ Provides a uniform interface for accessing binary data from local files, remote 
 
     // read slice of file, works on remote files with range request, pre-allocate buffer
     const buf = Buffer.alloc(10)
-    const bytesRead = await remote.read(buf, 0, 10, 10)
+    const {bytesRead} = await remote.read(buf, 0, 10, 10)
     console.log(buf.toString())
 
     // readFile, returns buffer
@@ -32,7 +32,7 @@ Provides a uniform interface for accessing binary data from local files, remote 
 
 ## API
 
-### async read(buf:Buffer, offset: number=0, length: number, position: number=0, opts?: Options): Promise<number>
+### async read(buf:Buffer, offset: number=0, length: number, position: number=0, opts?: Options): Promise<{bytesRead:number,buffer:Buffer}>
 
 * buf - a pre-allocated buffer that can contain length bytes
 * offset - an offset into the buffer to write into
