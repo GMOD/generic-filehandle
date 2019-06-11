@@ -8,47 +8,43 @@ interface Stats {
 function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
   const fileReader = new FileReader()
 
-  return new Promise(
-    (resolve, reject): void => {
-      fileReader.onerror = (): void => {
-        fileReader.abort()
-        reject(new Error('problem reading blob'))
-      }
+  return new Promise((resolve, reject): void => {
+    fileReader.onerror = (): void => {
+      fileReader.abort()
+      reject(new Error('problem reading blob'))
+    }
 
-      fileReader.onabort = (): void => {
-        reject(new Error('blob reading was aborted'))
-      }
+    fileReader.onabort = (): void => {
+      reject(new Error('blob reading was aborted'))
+    }
 
-      fileReader.onload = (): void => {
-        if (fileReader.result && typeof fileReader.result !== 'string') resolve(fileReader.result)
-        else reject(new Error('unknown error reading blob'))
-      }
-      fileReader.readAsArrayBuffer(blob)
-    },
-  )
+    fileReader.onload = (): void => {
+      if (fileReader.result && typeof fileReader.result !== 'string') resolve(fileReader.result)
+      else reject(new Error('unknown error reading blob'))
+    }
+    fileReader.readAsArrayBuffer(blob)
+  })
 }
 
 function readBlobAsText(blob: Blob): Promise<string> {
   const fileReader = new FileReader()
 
-  return new Promise(
-    (resolve, reject): void => {
-      fileReader.onerror = (): void => {
-        fileReader.abort()
-        reject(new Error('problem reading blob'))
-      }
+  return new Promise((resolve, reject): void => {
+    fileReader.onerror = (): void => {
+      fileReader.abort()
+      reject(new Error('problem reading blob'))
+    }
 
-      fileReader.onabort = (): void => {
-        reject(new Error('blob reading was aborted'))
-      }
+    fileReader.onabort = (): void => {
+      reject(new Error('blob reading was aborted'))
+    }
 
-      fileReader.onload = (): void => {
-        if (fileReader.result && typeof fileReader.result === 'string') resolve(fileReader.result)
-        else reject(new Error('unknown error reading blob'))
-      }
-      fileReader.readAsText(blob)
-    },
-  )
+    fileReader.onload = (): void => {
+      if (fileReader.result && typeof fileReader.result === 'string') resolve(fileReader.result)
+      else reject(new Error('unknown error reading blob'))
+    }
+    fileReader.readAsText(blob)
+  })
 }
 
 /**
