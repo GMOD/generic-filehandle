@@ -1,6 +1,7 @@
 import { promisify } from 'es6-promisify'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
-declare var __webpack_require__: any // eslint-disable-line @typescript-eslint/camelcase
+// eslint-disable-next-line @typescript-eslint/camelcase,no-var
+declare var __webpack_require__: any
 
 // don't load fs native module if running in webpacked code
 const fs = typeof __webpack_require__ !== 'function' ? require('fs') : null // eslint-disable-line @typescript-eslint/camelcase
@@ -28,9 +29,9 @@ export default class LocalFile implements GenericFilehandle {
 
   public async read(
     buffer: Buffer,
-    offset: number = 0,
+    offset = 0,
     length: number,
-    position: number = 0,
+    position = 0,
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const fetchLength = Math.min(buffer.length - offset, length)
     const ret = await fsRead(await this.getFd(), buffer, offset, fetchLength, position)

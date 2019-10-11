@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-//@ts-ignore TODO the @types/fetch-mock is confusing, it does have a default export
 import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
 import tenaciousFetch from 'tenacious-fetch'
 
-//@ts-ignore TODO the @types/range-parser is confusing, it does have a default export
 import rangeParser from 'range-parser'
 fetchMock.config.sendAsJson = false
 
@@ -14,7 +12,6 @@ const getFile = (url: string) => new LocalFile(require.resolve(url.replace('http
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)
   const range = rangeParser(10000, args.headers.range)
-  // @ts-ignore
   const { start, end } = range[0]
   const len = end - start
   let buf = Buffer.alloc(len)
@@ -76,7 +73,8 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
-        //@ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
         return res
       },
@@ -143,7 +141,8 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
-        //@ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         res.buffer = undefined // obscure the buffer method to test our arraybuffer parse
         res.arrayBuffer = undefined // also obscure arrayBuffer
         return res
