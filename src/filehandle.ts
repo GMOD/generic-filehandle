@@ -14,6 +14,11 @@ export interface FilehandleOptions {
   fetch?: Function
 }
 
+export interface Stats {
+  size: number
+  [key: string]: any
+}
+
 export interface GenericFilehandle {
   read(
     buf: Buffer,
@@ -23,4 +28,5 @@ export interface GenericFilehandle {
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
+  stat(): Promise<Stats>
 }

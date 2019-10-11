@@ -1,5 +1,5 @@
 import uri2path from 'file-uri-to-path'
-import { GenericFilehandle, FilehandleOptions } from './filehandle'
+import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 import { LocalFile } from '.'
 
 const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
@@ -13,9 +13,6 @@ interface PolyfilledResponse extends Response {
   buffer: Function | void
 }
 
-interface Stats {
-  size: number
-}
 export default class RemoteFile implements GenericFilehandle {
   private url: string
   private _stat?: Stats
