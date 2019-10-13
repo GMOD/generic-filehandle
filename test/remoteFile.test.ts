@@ -31,6 +31,17 @@ const readFile = async (url: string) => {
   return {
     status: 200,
     body: ret,
+    headers: { 'content-length': ret.length },
+  }
+}
+
+const readFileNoContentLength = async (url: string, args: any) => {
+  if (args && args.headers && args.headers.range) return readBuffer(url, args)
+  const file = getFile(url)
+  const ret = await file.readFile()
+  return {
+    status: 200,
+    body: ret,
   }
 }
 
@@ -161,8 +172,14 @@ describe('remote file tests', () => {
     expect(buf.toString()[0]).toBe('\0')
     expect(res.bytesRead).toEqual(0)
   })
-  it('stat', async () => {
-    fetchMock.mock('http://fakehost/test.txt', readBuffer)
+  it('stat using content-length', async () => {
+    fetchMock.mock('http://fakehost/test.txt', readFile)
+    const f = new RemoteFile('http://fakehost/test.txt')
+    const stat = await f.stat()
+    expect(stat.size).toEqual(8)
+  })
+  it('stat using content-range', async () => {
+    fetchMock.mock('http://fakehost/test.txt', readFileNoContentLength)
     const f = new RemoteFile('http://fakehost/test.txt')
     const stat = await f.stat()
     expect(stat.size).toEqual(8)

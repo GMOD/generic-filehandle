@@ -1,23 +1,14 @@
 import uri2path from 'file-uri-to-path'
-import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
+import { GenericFilehandle, FilehandleOptions, Stats, Fetcher, PolyfilledResponse } from './filehandle'
 import { LocalFile } from '.'
 
 const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
 
-/**
- * a fetch response object that might have some additional properties
- * that come from the underlying fetch implementation, such as the
- * `buffer` method on node-fetch responses.
- */
-interface PolyfilledResponse extends Response {
-  buffer: Function | void
-}
-
 export default class RemoteFile implements GenericFilehandle {
-  private url: string
-  private _stat?: Stats
-  private fetch: Function
-  private baseOverrides: any = {}
+  public url: string
+  public _stat?: Stats
+  public fetch?: Fetcher
+  public baseOverrides: any = {}
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
@@ -41,7 +32,6 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
-      this.fetch = (): void => {}
       return
     }
 
@@ -49,10 +39,42 @@ export default class RemoteFile implements GenericFilehandle {
     if (!fetch) {
       throw new TypeError(`no fetch function supplied, and none found in global environment`)
     }
+    this.fetch = fetch
+
     if (opts.overrides) {
       this.baseOverrides = opts.overrides
     }
-    this.fetch = fetch
+  }
+
+  public async getFetch(opts: FilehandleOptions): Promise<PolyfilledResponse> {
+    if (!this.fetch) throw new Error('a fetch function must be available unless using a file:// url')
+    const { headers = {}, signal, overrides = {} } = opts
+    const requestOptions = {
+      headers,
+      method: 'GET',
+      redirect: 'follow',
+      mode: 'cors',
+      signal,
+      ...this.baseOverrides,
+      ...overrides,
+    }
+    const response = await this.fetch(this.url, requestOptions)
+    if (!this._stat) {
+      // try to parse out the size of the remote file
+      if (requestOptions.headers && requestOptions.headers.range) {
+        const contentRange = response.headers.get('content-range')
+        const sizeMatch = /\/(\d+)$/.exec(contentRange || '')
+        if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
+      } else {
+        const contentLength = response.headers.get('content-length')
+        if (contentLength) this._stat = { size: parseInt(contentLength, 10) }
+      }
+    }
+    return response
+  }
+
+  public async headFetch(): Promise<PolyfilledResponse> {
+    return this.getFetch({ overrides: { method: 'HEAD' } })
   }
 
   public async read(
@@ -62,31 +84,17 @@ export default class RemoteFile implements GenericFilehandle {
     position = 0,
     opts: FilehandleOptions = {},
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
-    const { headers = {}, signal, overrides = {} } = opts
+    opts.headers = opts.headers || {}
     if (length < Infinity) {
-      headers.range = `bytes=${position}-${position + length}`
+      opts.headers.range = `bytes=${position}-${position + length}`
     } else if (length === Infinity && position !== 0) {
-      headers.range = `bytes=${position}-`
+      opts.headers.range = `bytes=${position}-`
     }
 
-    const response = await this.fetch(this.url, {
-      headers,
-      method: 'GET',
-      redirect: 'follow',
-      mode: 'cors',
-      signal,
-      ...this.baseOverrides,
-      ...overrides,
-    })
-
+    const response = await this.getFetch(opts)
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
       const bytesCopied = responseData.copy(buffer, offset, 0, Math.min(length, responseData.length))
-
-      // try to parse out the size of the remote file
-      const res = response.headers.get('content-range')
-      const sizeMatch = /\/(\d+)$/.exec(res || '')
-      if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
 
       return { bytesRead: bytesCopied, buffer }
     }
@@ -106,16 +114,7 @@ export default class RemoteFile implements GenericFilehandle {
       opts = options
       delete opts.encoding
     }
-    const { headers = {}, signal, overrides = {} } = opts
-    const response = await this.fetch(this.url, {
-      headers,
-      method: 'GET',
-      redirect: 'follow',
-      mode: 'cors',
-      signal,
-      ...this.baseOverrides,
-      ...overrides,
-    })
+    const response = await this.getFetch(opts)
     if (response.status !== 200) {
       throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
         status: response.status,
@@ -127,11 +126,9 @@ export default class RemoteFile implements GenericFilehandle {
   }
 
   public async stat(): Promise<Stats> {
-    if (!this._stat) {
-      const buf = Buffer.allocUnsafe(10)
-      await this.read(buf, 0, 10, 0)
-      if (!this._stat) throw new Error(`unable to determine size of file at ${this.url}`)
-    }
+    if (!this._stat) await this.headFetch()
+    if (!this._stat) await this.read(Buffer.allocUnsafe(10), 0, 10, 0)
+    if (!this._stat) throw new Error(`unable to determine size of file at ${this.url}`)
     return this._stat
   }
 }
