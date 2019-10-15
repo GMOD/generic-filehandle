@@ -5,10 +5,10 @@ import { LocalFile } from '.'
 const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
-  public url: string
-  public _stat?: Stats
-  public fetch?: Fetcher
-  public baseOverrides: any = {}
+  protected url: string
+  protected _stat?: Stats
+  protected fetch?: Fetcher
+  protected baseOverrides: any = {}
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
