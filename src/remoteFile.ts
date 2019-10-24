@@ -46,7 +46,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
   }
 
-  public async getFetch(opts: FilehandleOptions): Promise<PolyfilledResponse> {
+  protected async getFetch(opts: FilehandleOptions): Promise<PolyfilledResponse> {
     if (!this.fetch) throw new Error('a fetch function must be available unless using a file:// url')
     const { headers = {}, signal, overrides = {} } = opts
     const requestOptions = {
@@ -73,7 +73,7 @@ export default class RemoteFile implements GenericFilehandle {
     return response
   }
 
-  public async headFetch(): Promise<PolyfilledResponse> {
+  protected async headFetch(): Promise<PolyfilledResponse> {
     return this.getFetch({ overrides: { method: 'HEAD' } })
   }
 
