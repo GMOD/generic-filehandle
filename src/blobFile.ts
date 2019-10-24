@@ -1,7 +1,4 @@
-import { GenericFilehandle, FilehandleOptions } from './filehandle'
-interface Stats {
-  size: number
-}
+import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 
 // Using this you can "await" the file like a normal promise
 // https://blog.shovonhasan.com/using-promises-with-filereader/

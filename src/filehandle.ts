@@ -1,3 +1,14 @@
+export type Fetcher = (input: RequestInfo, init?: RequestInit) => Promise<PolyfilledResponse>
+
+/**
+ * a fetch response object that might have some additional properties
+ * that come from the underlying fetch implementation, such as the
+ * `buffer` method on node-fetch responses.
+ */
+export interface PolyfilledResponse extends Response {
+  buffer?: Function | void
+}
+
 export interface FilehandleOptions {
   /**
    * optional AbortSignal object for aborting the request
@@ -11,7 +22,12 @@ export interface FilehandleOptions {
    * global fetch. if there is no global fetch, and a fetch function is not provided,
    * throws an error.
    */
-  fetch?: Function
+  fetch?: Fetcher
+}
+
+export interface Stats {
+  size: number
+  [key: string]: any
 }
 
 export interface GenericFilehandle {
@@ -23,4 +39,5 @@ export interface GenericFilehandle {
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
+  stat(): Promise<Stats>
 }
