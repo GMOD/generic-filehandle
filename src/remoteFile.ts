@@ -1,22 +1,13 @@
 import uri2path from 'file-uri-to-path'
-import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
+import { GenericFilehandle, FilehandleOptions, Stats, Fetcher, PolyfilledResponse } from './filehandle'
 import { LocalFile } from '.'
 
 const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
 
-/**
- * a fetch response object that might have some additional properties
- * that come from the underlying fetch implementation, such as the
- * `buffer` method on node-fetch responses.
- */
-interface PolyfilledResponse extends Response {
-  buffer: Function | void
-}
-
 export default class RemoteFile implements GenericFilehandle {
   private url: string
   private _stat?: Stats
-  private fetch: Function
+  private fetch: Fetcher
   private baseOverrides: any = {}
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
@@ -41,6 +32,8 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
       this.fetch = (): void => {}
       return
     }
