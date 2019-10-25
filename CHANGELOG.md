@@ -1,3 +1,5 @@
+- Fix the typescript typings for stat and some other things
+
 # [2.0.0](https://github.com/GMOD/generic-filehandle/compare/v1.0.9...v2.0.0) (2019-06-05)
 
 
