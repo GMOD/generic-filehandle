@@ -18,7 +18,9 @@ describe('blob filehandle', () => {
     expect(fileContents).toEqual('testing\n')
     const fileContents2 = await blobFile.readFile({ encoding: 'utf8' })
     expect(fileContents2).toEqual('testing\n')
-    await expect(blobFile.readFile('fakeEncoding')).rejects.toThrow(/unsupported encoding/)
+    await expect(blobFile.readFile('fakeEncoding')).rejects.toThrow(
+      /unsupported encoding/,
+    )
   })
   it('reads file part', async () => {
     const fileBuf = fs.readFileSync(require.resolve('./data/test.txt'))

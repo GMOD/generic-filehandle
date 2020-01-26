@@ -16,7 +16,8 @@ function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
     }
 
     fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result !== 'string') resolve(fileReader.result)
+      if (fileReader.result && typeof fileReader.result !== 'string')
+        resolve(fileReader.result)
       else reject(new Error('unknown error reading blob'))
     }
     fileReader.readAsArrayBuffer(blob)
@@ -37,7 +38,8 @@ function readBlobAsText(blob: Blob): Promise<string> {
     }
 
     fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result === 'string') resolve(fileReader.result)
+      if (fileReader.result && typeof fileReader.result === 'string')
+        resolve(fileReader.result)
       else reject(new Error('unknown error reading blob'))
     }
     fileReader.readAsText(blob)

@@ -1,5 +1,10 @@
-export type Fetcher = (input: RequestInfo, init?: RequestInit) => Promise<PolyfilledResponse>
+export type Fetcher = (
+  input: RequestInfo,
+  init?: RequestInit,
+) => Promise<PolyfilledResponse>
 
+export type TypeName = string | FilehandleOptions | undefined
+export type ObjectType<T> = T extends 'utf8' ? string : Buffer
 /**
  * a fetch response object that might have some additional properties
  * that come from the underlying fetch implementation, such as the
@@ -14,6 +19,7 @@ export interface FilehandleOptions {
    * optional AbortSignal object for aborting the request
    */
   signal?: AbortSignal
+  statusCallback?: Function
   headers?: any
   overrides?: any
   encoding?: string | null
@@ -38,6 +44,7 @@ export interface GenericFilehandle {
     position: number,
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Buffer }>
-  readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
+
+  readFile<T extends TypeName>(options: T): Promise<ObjectType<T>[]>
   stat(): Promise<Stats>
 }

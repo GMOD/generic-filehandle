@@ -15,7 +15,9 @@ describe('test util functions', () => {
   it('open', async () => {
     const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', () => {})
     const f = new LocalFile('/var')
-    expect(open('http://google.com', undefined, undefined, { fetch }).constructor.name).toEqual('RemoteFile')
+    expect(
+      open('http://google.com', undefined, undefined, { fetch }).constructor.name,
+    ).toEqual('RemoteFile')
     expect(open(undefined, '/var/').constructor.name).toEqual('LocalFile')
     expect(open(undefined, undefined, f).constructor.name).toEqual('LocalFile')
     expect(() => open(undefined, undefined, undefined)).toThrow(/cannot open/)

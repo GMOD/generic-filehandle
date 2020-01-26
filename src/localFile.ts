@@ -1,5 +1,5 @@
 import { promisify } from 'es6-promisify'
-import { GenericFilehandle, FilehandleOptions } from './filehandle'
+import { GenericFilehandle, FilehandleOptions, TypeName, ObjectType } from './filehandle'
 // eslint-disable-next-line @typescript-eslint/camelcase,no-var
 declare var __webpack_require__: any
 
@@ -38,7 +38,7 @@ export default class LocalFile implements GenericFilehandle {
     return { bytesRead: ret, buffer }
   }
 
-  public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+  public async readFile<T>(options: T): Promise<ObjectType<T>[]> {
     return fsReadFile(this.filename, options)
   }
   // todo memoize

@@ -1,8 +1,21 @@
 import uri2path from 'file-uri-to-path'
-import { GenericFilehandle, FilehandleOptions, Stats, Fetcher, PolyfilledResponse } from './filehandle'
+import {
+  GenericFilehandle,
+  FilehandleOptions,
+  Stats,
+  Fetcher,
+  PolyfilledResponse,
+  TypeName,
+  ObjectType,
+} from './filehandle'
 import { LocalFile } from '.'
 
-const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
+const myGlobal =
+  typeof window !== 'undefined'
+    ? window
+    : typeof self !== 'undefined'
+    ? self
+    : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
   private url: string
@@ -17,7 +30,9 @@ export default class RemoteFile implements GenericFilehandle {
       const resp = await response.arrayBuffer()
       return Buffer.from(resp)
     } else {
-      throw new TypeError('invalid HTTP response object, has no buffer method, and no arrayBuffer method')
+      throw new TypeError(
+        'invalid HTTP response object, has no buffer method, and no arrayBuffer method',
+      )
     }
   }
 
@@ -32,15 +47,16 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
+      //@ts-ignore
       this.fetch = (): void => {}
       return
     }
 
     const fetch = opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
     if (!fetch) {
-      throw new TypeError(`no fetch function supplied, and none found in global environment`)
+      throw new TypeError(
+        `no fetch function supplied, and none found in global environment`,
+      )
     }
     if (opts.overrides) {
       this.baseOverrides = opts.overrides
@@ -74,7 +90,12 @@ export default class RemoteFile implements GenericFilehandle {
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
-      const bytesCopied = responseData.copy(buffer, offset, 0, Math.min(length, responseData.length))
+      const bytesCopied = responseData.copy(
+        buffer,
+        offset,
+        0,
+        Math.min(length, responseData.length),
+      )
 
       // try to parse out the size of the remote file
       const res = response.headers.get('content-range')
@@ -88,20 +109,15 @@ export default class RemoteFile implements GenericFilehandle {
     throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
-  public async readFile(options: FilehandleOptions | string = {}): Promise<Buffer | string> {
-    let encoding
-    let opts
-    if (typeof options === 'string') {
-      encoding = options
-      opts = {}
-    } else {
-      encoding = options.encoding
-      opts = options
-      delete opts.encoding
-    }
+  public async readFile<T extends TypeName>(options: T): Promise<ObjectType<T>[]> {
+    const opts =
+      typeof options === 'string'
+        ? { signal: undefined, overrides: {}, headers: {} }
+        : (options as FilehandleOptions)
+    const encoding = typeof options === 'string' ? options : opts.encoding
     const { headers = {}, signal, overrides = {} } = opts
     const response = await this.fetch(this.url, {
-      headers,
+      ...headers,
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
@@ -114,9 +130,11 @@ export default class RemoteFile implements GenericFilehandle {
         status: response.status,
       })
     }
-    if (encoding === 'utf8') return response.text()
+    if (encoding === 'utf8') {
+      return (await response.text()) as ObjectType<T>[]
+    }
     if (encoding) throw new Error(`unsupported encoding: ${encoding}`)
-    return this.getBufferFromResponse(response)
+    return this.getBufferFromResponse(response) as ObjectType<T>[]
   }
 
   public async stat(): Promise<Stats> {
