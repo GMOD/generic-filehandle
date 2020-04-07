@@ -1,3 +1,5 @@
+- Upgrade dependencies
+
 ## [2.0.1](https://github.com/GMOD/generic-filehandle/compare/v2.0.0...v2.0.1) (2019-10-25)
 
 
