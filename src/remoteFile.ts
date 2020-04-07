@@ -34,7 +34,9 @@ export default class RemoteFile implements GenericFilehandle {
       this.stat = localFile.stat.bind(localFile)
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      this.fetch = (): void => {}
+      this.fetch = (): void => {
+        /* intentionally blank */
+      }
       return
     }
 
