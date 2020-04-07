@@ -53,6 +53,14 @@ describe('remote file tests', () => {
     const res = f.readFile({ overrides: { fetcher: fetch, retries: 0 } })
     await expect(res).rejects.toThrow(/HTTP 404/)
   })
+  it('tenacious fetch with 403', async () => {
+    const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', 403)
+    const f = new RemoteFile('http://fakehost/test.txt', {
+      fetch: tenaciousFetch,
+    })
+    const res = f.readFile({ overrides: { fetcher: fetch, retries: 0 } })
+    await expect(res).rejects.toThrow(/HTTP 403/)
+  })
   it('tenacious fetch base overrides', async () => {
     const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt', {
