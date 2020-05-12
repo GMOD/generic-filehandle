@@ -30,6 +30,15 @@ Provides a uniform interface for accessing binary data from local files, remote 
     const buf = remote.readFile()
 ```
 
+
+Important: under node.js, you should supply a fetch function to the RemoteFile constructor
+
+```js
+    import {RemoteFile} from 'generic-filehandle'
+    import fetch from 'node-fetch'
+    const remote = new RemoteFile('http://somesite.com/file.txt', {fetch})
+```
+
 ## API
 
 ### async read(buf:Buffer, offset: number=0, length: number, position: number=0, opts?: Options): Promise<{bytesRead:number,buffer:Buffer}>
