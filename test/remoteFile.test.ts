@@ -194,7 +194,6 @@ describe('remote file tests', () => {
   })
   it('auth token with range request', async () => {
     fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
-      console.log(args.headers)
       if (args.headers.Authorization && args.headers.range) {
         return {
           status: 206,
