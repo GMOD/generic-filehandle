@@ -1,3 +1,18 @@
+- Fix ability to supply things like Authorization token to the constructor
+
+example syntax
+
+```
+const f = new RemoteFile("http://yourwebsite/file.bam", {
+  overrides: {
+    headers: {
+      Authorization: "Basic YWxhZGRpbjpvcGVuc2VzYW1l",
+    },
+  },
+});
+```
+
+
 ## [2.0.2](https://github.com/GMOD/generic-filehandle/compare/v2.0.1...v2.0.2) (2020-04-07)
 
 
