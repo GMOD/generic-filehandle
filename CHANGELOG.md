@@ -1,3 +1,7 @@
+## [2.0.3](https://github.com/GMOD/generic-filehandle/compare/v2.0.2...v2.0.3) (2020-06-05)
+
+
+
 - Fix ability to supply things like Authorization token to the constructor
 
 example syntax
