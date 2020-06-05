@@ -65,13 +65,13 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     const response = await this.fetch(this.url, {
-      headers,
+      ...this.baseOverrides,
+      ...overrides,
+      headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
       signal,
-      ...this.baseOverrides,
-      ...overrides,
     })
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
