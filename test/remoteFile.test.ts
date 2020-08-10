@@ -7,7 +7,8 @@ import tenaciousFetch from 'tenacious-fetch'
 import rangeParser from 'range-parser'
 fetchMock.config.sendAsJson = false
 
-const getFile = (url: string) => new LocalFile(require.resolve(url.replace('http://fakehost/', './data/')))
+const getFile = (url: string) =>
+  new LocalFile(require.resolve(url.replace('http://fakehost/', './data/')))
 // fakes server responses from local file object with fetchMock
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)

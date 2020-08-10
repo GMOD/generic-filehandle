@@ -1,8 +1,19 @@
 import uri2path from 'file-uri-to-path'
-import { GenericFilehandle, FilehandleOptions, Stats, Fetcher, PolyfilledResponse } from './filehandle'
+import {
+  GenericFilehandle,
+  FilehandleOptions,
+  Stats,
+  Fetcher,
+  PolyfilledResponse,
+} from './filehandle'
 import { LocalFile } from '.'
 
-const myGlobal = typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : { fetch: undefined }
+const myGlobal =
+  typeof window !== 'undefined'
+    ? window
+    : typeof self !== 'undefined'
+    ? self
+    : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
   private url: string
@@ -17,7 +28,9 @@ export default class RemoteFile implements GenericFilehandle {
       const resp = await response.arrayBuffer()
       return Buffer.from(resp)
     } else {
-      throw new TypeError('invalid HTTP response object, has no buffer method, and no arrayBuffer method')
+      throw new TypeError(
+        'invalid HTTP response object, has no buffer method, and no arrayBuffer method',
+      )
     }
   }
 
@@ -27,7 +40,9 @@ export default class RemoteFile implements GenericFilehandle {
     // if it is a file URL, monkey-patch ourselves to act like a LocalFile
     if (source.startsWith('file://')) {
       const path = uri2path(source)
-      if (!path) throw new TypeError('invalid file url')
+      if (!path) {
+        throw new TypeError('invalid file url')
+      }
       const localFile = new LocalFile(path)
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
@@ -42,7 +57,9 @@ export default class RemoteFile implements GenericFilehandle {
 
     const fetch = opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
     if (!fetch) {
-      throw new TypeError(`no fetch function supplied, and none found in global environment`)
+      throw new TypeError(
+        `no fetch function supplied, and none found in global environment`,
+      )
     }
     if (opts.overrides) {
       this.baseOverrides = opts.overrides
@@ -63,34 +80,48 @@ export default class RemoteFile implements GenericFilehandle {
     } else if (length === Infinity && position !== 0) {
       headers.range = `bytes=${position}-`
     }
-
-    const response = await this.fetch(this.url, {
+    const args = {
       ...this.baseOverrides,
       ...overrides,
       headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
+      credentials: 'include',
       signal,
-    })
+    }
+    const response = await this.fetch(this.url, args)
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
-      const bytesCopied = responseData.copy(buffer, offset, 0, Math.min(length, responseData.length))
+      const bytesCopied = responseData.copy(
+        buffer,
+        offset,
+        0,
+        Math.min(length, responseData.length),
+      )
 
       // try to parse out the size of the remote file
       const res = response.headers.get('content-range')
       const sizeMatch = /\/(\d+)$/.exec(res || '')
-      if (sizeMatch && sizeMatch[1]) this._stat = { size: parseInt(sizeMatch[1], 10) }
+      if (sizeMatch && sizeMatch[1]) {
+        this._stat = { size: parseInt(sizeMatch[1], 10) }
+      }
 
       return { bytesRead: bytesCopied, buffer }
+    }
+
+    if (response.status === 200) {
+      throw new Error('${this.url} fetch returned status 200, expected 206')
     }
 
     // TODO: try harder here to gather more information about what the problem is
     throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
-  public async readFile(options: FilehandleOptions | string = {}): Promise<Buffer | string> {
+  public async readFile(
+    options: FilehandleOptions | string = {},
+  ): Promise<Buffer | string> {
     let encoding
     let opts
     if (typeof options === 'string') {
@@ -107,6 +138,7 @@ export default class RemoteFile implements GenericFilehandle {
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
+      credentials: 'include',
       signal,
       ...this.baseOverrides,
       ...overrides,
@@ -116,8 +148,12 @@ export default class RemoteFile implements GenericFilehandle {
         status: response.status,
       })
     }
-    if (encoding === 'utf8') return response.text()
-    if (encoding) throw new Error(`unsupported encoding: ${encoding}`)
+    if (encoding === 'utf8') {
+      return response.text()
+    }
+    if (encoding) {
+      throw new Error(`unsupported encoding: ${encoding}`)
+    }
     return this.getBufferFromResponse(response)
   }
 
@@ -125,7 +161,9 @@ export default class RemoteFile implements GenericFilehandle {
     if (!this._stat) {
       const buf = Buffer.allocUnsafe(10)
       await this.read(buf, 0, 10, 0)
-      if (!this._stat) throw new Error(`unable to determine size of file at ${this.url}`)
+      if (!this._stat) {
+        throw new Error(`unable to determine size of file at ${this.url}`)
+      }
     }
     return this._stat
   }

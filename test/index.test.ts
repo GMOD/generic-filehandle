@@ -19,7 +19,9 @@ describe('test util functions', () => {
       /* intentionally blank */
     })
     const f = new LocalFile('/var')
-    expect(open('http://google.com', undefined, undefined, { fetch }).constructor.name).toEqual('RemoteFile')
+    expect(
+      open('http://google.com', undefined, undefined, { fetch }).constructor.name,
+    ).toEqual('RemoteFile')
     expect(open(undefined, '/var/').constructor.name).toEqual('LocalFile')
     expect(open(undefined, undefined, f).constructor.name).toEqual('LocalFile')
     expect(() => open(undefined, undefined, undefined)).toThrow(/cannot open/)

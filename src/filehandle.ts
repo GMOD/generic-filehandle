@@ -1,4 +1,7 @@
-export type Fetcher = (input: RequestInfo, init?: RequestInit) => Promise<PolyfilledResponse>
+export type Fetcher = (
+  input: RequestInfo,
+  init?: RequestInit,
+) => Promise<PolyfilledResponse>
 
 /**
  * a fetch response object that might have some additional properties

@@ -13,9 +13,15 @@ function open(
   maybeFilehandle?: GenericFilehandle,
   opts: FilehandleOptions = {},
 ): GenericFilehandle {
-  if (maybeFilehandle !== undefined) return maybeFilehandle
-  if (maybeUrl !== undefined) return fromUrl(maybeUrl, opts)
-  if (maybePath !== undefined) return new LocalFile(maybePath, opts)
+  if (maybeFilehandle !== undefined) {
+    return maybeFilehandle
+  }
+  if (maybeUrl !== undefined) {
+    return fromUrl(maybeUrl, opts)
+  }
+  if (maybePath !== undefined) {
+    return new LocalFile(maybePath, opts)
+  }
   throw new Error('no url, path, or filehandle provided, cannot open')
 }
 

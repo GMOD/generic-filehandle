@@ -16,8 +16,11 @@ function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
     }
 
     fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result !== 'string') resolve(fileReader.result)
-      else reject(new Error('unknown error reading blob'))
+      if (fileReader.result && typeof fileReader.result !== 'string') {
+        resolve(fileReader.result)
+      } else {
+        reject(new Error('unknown error reading blob'))
+      }
     }
     fileReader.readAsArrayBuffer(blob)
   })
@@ -37,8 +40,11 @@ function readBlobAsText(blob: Blob): Promise<string> {
     }
 
     fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result === 'string') resolve(fileReader.result)
-      else reject(new Error('unknown error reading blob'))
+      if (fileReader.result && typeof fileReader.result === 'string') {
+        resolve(fileReader.result)
+      } else {
+        reject(new Error('unknown error reading blob'))
+      }
     }
     fileReader.readAsText(blob)
   })
@@ -83,10 +89,17 @@ export default class BlobFile implements GenericFilehandle {
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
     let encoding
-    if (typeof options === 'string') encoding = options
-    else encoding = options && options.encoding
-    if (encoding === 'utf8') return readBlobAsText(this.blob)
-    if (encoding) throw new Error(`unsupported encoding: ${encoding}`)
+    if (typeof options === 'string') {
+      encoding = options
+    } else {
+      encoding = options && options.encoding
+    }
+    if (encoding === 'utf8') {
+      return readBlobAsText(this.blob)
+    }
+    if (encoding) {
+      throw new Error(`unsupported encoding: ${encoding}`)
+    }
     const result = await readBlobAsArrayBuffer(this.blob)
     return Buffer.from(result)
   }
