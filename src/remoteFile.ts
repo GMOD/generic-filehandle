@@ -1,4 +1,6 @@
 import uri2path from 'file-uri-to-path'
+//@ts-ignore
+import fetchProgress from './fetch-progress'
 import {
   GenericFilehandle,
   FilehandleOptions,
@@ -87,10 +89,23 @@ export default class RemoteFile implements GenericFilehandle {
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
-      credentials: 'include',
       signal,
     }
-    const response = await this.fetch(this.url, args)
+    const response = await this.fetch(this.url, args).then(
+      fetchProgress({
+        // implement onProgress method
+        onProgress(progress: {
+          total: number
+          transferred: number
+          speed: number
+          eta: number
+          percentage: number
+          remaining: number
+        }) {
+          console.log(progress.percentage)
+        },
+      }),
+    )
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
@@ -112,7 +127,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status === 200) {
-      throw new Error('${this.url} fetch returned status 200, expected 206')
+      throw new Error(`${this.url} fetch returned status 200, expected 206`)
     }
 
     // TODO: try harder here to gather more information about what the problem is
@@ -138,11 +153,25 @@ export default class RemoteFile implements GenericFilehandle {
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
-      credentials: 'include',
       signal,
       ...this.baseOverrides,
       ...overrides,
-    })
+    }).then(
+      fetchProgress({
+        // implement onProgress method
+        onProgress(progress: {
+          total: number
+          transferred: number
+          speed: number
+          eta: number
+          percentage: number
+          remaining: number
+        }) {
+          console.log(progress.percentage)
+        },
+      }),
+    )
+
     if (response.status !== 200) {
       throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
         status: response.status,

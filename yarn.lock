@@ -2635,6 +2635,11 @@ fetch-mock@^9.7.0:
     querystring "^0.2.0"
     whatwg-url "^6.5.0"
 
+fetch-progress@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/fetch-progress/-/fetch-progress-1.2.0.tgz#23f8d931a889e4b637e97879b97ec4e633fdfbff"
+  integrity sha512-i3eO9oA0cMWG0ePh3u5i58t43/nKUBU7MEcMeTqRwu4tUj4Wl6SK8GP0X/Q7iU6iVyKGn8Xuon9wFOnW8JL3UA==
+
 figures@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/figures/-/figures-3.2.0.tgz#625c18bd293c604dc4a8ddb2febf0c88341746af"
