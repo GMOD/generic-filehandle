@@ -102,6 +102,10 @@ export default class RemoteFile implements GenericFilehandle {
       }
     }
 
+    if (!response) {
+      throw new Error('generic-filehandle failed to fetch')
+    }
+
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
       const bytesCopied = responseData.copy(
@@ -158,6 +162,10 @@ export default class RemoteFile implements GenericFilehandle {
     } catch (e) {
       this.prefix = this.corsProxy
       response = await this.fetch(this.prefix + this.url)
+    }
+
+    if (!response) {
+      throw new Error('generic-filehandle failed to fetch')
     }
 
     if (response.status !== 200) {
