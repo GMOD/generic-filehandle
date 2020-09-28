@@ -20,6 +20,8 @@ export default class RemoteFile implements GenericFilehandle {
   private _stat?: Stats
   private fetch: Fetcher
   private baseOverrides: any = {}
+  private corsProxy = 'https://cors-anywhere.herokuapp.com/'
+  private prefix = ''
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
@@ -87,10 +89,18 @@ export default class RemoteFile implements GenericFilehandle {
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
-      credentials: 'include',
       signal,
     }
-    const response = await this.fetch(this.url, args)
+    let response
+    try {
+      response = await this.fetch(this.prefix + this.url, args)
+    } catch (e) {
+      console.log(e.message)
+      if (e.message === 'Failed to fetch') {
+        this.prefix = this.corsProxy
+        response = await this.fetch(this.prefix + this.url, args)
+      }
+    }
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
       const responseData = await this.getBufferFromResponse(response)
@@ -133,16 +143,23 @@ export default class RemoteFile implements GenericFilehandle {
       delete opts.encoding
     }
     const { headers = {}, signal, overrides = {} } = opts
-    const response = await this.fetch(this.url, {
+    const args = {
       headers,
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
-      credentials: 'include',
       signal,
       ...this.baseOverrides,
       ...overrides,
-    })
+    }
+    let response
+    try {
+      response = await this.fetch(this.prefix + this.url, args)
+    } catch (e) {
+      this.prefix = this.corsProxy
+      response = await this.fetch(this.prefix + this.url)
+    }
+
     if (response.status !== 200) {
       throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
         status: response.status,
