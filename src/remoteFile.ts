@@ -104,7 +104,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (!response.ok) {
-      throw new Error(`${response.statusText}`)
+      throw new Error(`HTTP ${response.status} ${response.statusText}`)
     }
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
