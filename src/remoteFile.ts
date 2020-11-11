@@ -20,8 +20,6 @@ export default class RemoteFile implements GenericFilehandle {
   private _stat?: Stats
   private fetch: Fetcher
   private baseOverrides: any = {}
-  private corsProxy = 'https://cors-anywhere.herokuapp.com/'
-  private prefix = ''
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
@@ -93,18 +91,23 @@ export default class RemoteFile implements GenericFilehandle {
     }
     let response
     try {
-      response = await this.fetch(this.prefix + this.url, args)
+      response = await this.fetch(this.url, args)
     } catch (e) {
+      console.error(e.status, e)
       if (e.message === 'Failed to fetch') {
-        this.prefix = this.corsProxy
-        response = await this.fetch(this.prefix + this.url, args)
+        // refetch to to help address issue #72 especially where chrome cache
+        // pollution causes a CORS error
+        console.warn(
+          `refetching ${this.url} to try to avoid cache pollution related cors error`,
+        )
+        response = await this.fetch(this.url, { ...args, cache: 'reload' })
       } else {
         throw e
       }
     }
 
     if (!response.ok) {
-      throw new Error(`${response.statusText}`)
+      throw new Error(`HTTP ${response.status} ${response.statusText}`)
     }
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
@@ -159,10 +162,16 @@ export default class RemoteFile implements GenericFilehandle {
     }
     let response
     try {
-      response = await this.fetch(this.prefix + this.url, args)
+      response = await this.fetch(this.url, args)
     } catch (e) {
-      this.prefix = this.corsProxy
-      response = await this.fetch(this.prefix + this.url)
+      // refetch to to help address issue #72 especially where chrome cache
+      // pollution causes a CORS error
+      if (e.message === 'Failed to fetch') {
+        console.warn(
+          `refetching ${this.url} to try to avoid cache pollution related cors error`,
+        )
+        response = await this.fetch(this.url, { ...args, cache: 'reload' })
+      }
     }
 
     if (!response) {
