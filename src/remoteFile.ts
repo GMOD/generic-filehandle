@@ -95,15 +95,16 @@ export default class RemoteFile implements GenericFilehandle {
     try {
       response = await this.fetch(this.prefix + this.url, args)
     } catch (e) {
-      console.log(e.message)
       if (e.message === 'Failed to fetch') {
         this.prefix = this.corsProxy
         response = await this.fetch(this.prefix + this.url, args)
+      } else {
+        throw e
       }
     }
 
-    if (!response) {
-      throw new Error('generic-filehandle failed to fetch')
+    if (!response.ok) {
+      throw new Error(`${response.statusText}`)
     }
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
