@@ -83,7 +83,12 @@ export default class RemoteFile implements GenericFilehandle {
     const args = {
       ...this.baseOverrides,
       ...overrides,
-      headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
+      headers: {
+        ...headers,
+        ...overrides.headers,
+        ...this.baseOverrides.headers,
+        'x-jbrowse': 'true',
+      },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
@@ -112,7 +117,9 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status === 200) {
-      throw new Error('${this.url} fetch returned status 200, expected 206')
+      throw new Error(
+        `${this.url} fetch returned status 200, expected 206 (range request response) check that your serve is configured to respond to byte range requests`,
+      )
     }
 
     // TODO: try harder here to gather more information about what the problem is
@@ -134,16 +141,21 @@ export default class RemoteFile implements GenericFilehandle {
     }
     const { headers = {}, signal, overrides = {} } = opts
     const response = await this.fetch(this.url, {
-      headers,
+      ...this.baseOverrides,
+      ...overrides,
+      headers: {
+        ...headers,
+        ...overrides.headers,
+        ...this.baseOverrides.headers,
+        'x-jbrowse': 'true',
+      },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
       credentials: 'include',
       signal,
-      ...this.baseOverrides,
-      ...overrides,
     })
-    if (response.status !== 200) {
+    if (!response.ok) {
       throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
         status: response.status,
       })
