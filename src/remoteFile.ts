@@ -87,7 +87,6 @@ export default class RemoteFile implements GenericFilehandle {
         ...headers,
         ...overrides.headers,
         ...this.baseOverrides.headers,
-        'x-jbrowse': 'true',
       },
       method: 'GET',
       redirect: 'follow',
