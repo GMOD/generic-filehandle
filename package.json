@@ -29,7 +29,7 @@
     "watch": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline --watch",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
-    "postpublish": "git push origin master --follow-tags"
+    "postversion": "git push --follow-tags"
   },
   "keywords": [
     "bionode",
