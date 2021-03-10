@@ -110,6 +110,7 @@ export default class RemoteFile implements GenericFilehandle {
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
+      credentials: 'include',
       signal,
     }
     const response = await this.fetch(this.url, args)
