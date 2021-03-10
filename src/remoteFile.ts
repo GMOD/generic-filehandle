@@ -18,7 +18,7 @@ const myGlobal =
 export default class RemoteFile implements GenericFilehandle {
   private url: string
   private _stat?: Stats
-  private fetch: Fetcher
+  private fetchImplementation: Fetcher
   private baseOverrides: any = {}
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
@@ -49,7 +49,7 @@ export default class RemoteFile implements GenericFilehandle {
       this.stat = localFile.stat.bind(localFile)
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      this.fetch = (): void => {
+      this.fetchImplementation = (): void => {
         /* intentionally blank */
       }
       return
@@ -64,7 +64,30 @@ export default class RemoteFile implements GenericFilehandle {
     if (opts.overrides) {
       this.baseOverrides = opts.overrides
     }
-    this.fetch = fetch
+    this.fetchImplementation = fetch
+  }
+
+  public async fetch(
+    input: RequestInfo,
+    init: RequestInit | undefined,
+  ): Promise<PolyfilledResponse> {
+    let response
+    try {
+      response = await this.fetchImplementation(input, init)
+    } catch (e) {
+      if (e.message === 'Failed to fetch') {
+        // refetch to to help work around a chrome bug (discussed in generic-filehandle issue #72) in
+        // which the chrome cache returns a CORS error for content in its cache.
+        // see also https://github.com/GMOD/jbrowse-components/pull/1511
+        console.warn(
+          `generic-filehandle: refetching ${input} to attempt to work around chrome CORS header caching bug`,
+        )
+        response = await this.fetchImplementation(input, { ...init, cache: 'reload' })
+      } else {
+        throw e
+      }
+    }
+    return response
   }
 
   public async read(
@@ -89,22 +112,7 @@ export default class RemoteFile implements GenericFilehandle {
       mode: 'cors',
       signal,
     }
-    let response
-    try {
-      response = await this.fetch(this.url, args)
-    } catch (e) {
-      console.error(e.status, e)
-      if (e.message === 'Failed to fetch') {
-        // refetch to to help address issue #72 especially where chrome cache
-        // pollution causes a CORS error
-        console.warn(
-          `refetching ${this.url} to try to avoid cache pollution related cors error`,
-        )
-        response = await this.fetch(this.url, { ...args, cache: 'reload' })
-      } else {
-        throw e
-      }
-    }
+    const response = await this.fetch(this.url, args)
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status} ${response.statusText}`)
@@ -160,19 +168,7 @@ export default class RemoteFile implements GenericFilehandle {
       ...this.baseOverrides,
       ...overrides,
     }
-    let response
-    try {
-      response = await this.fetch(this.url, args)
-    } catch (e) {
-      // refetch to to help address issue #72 especially where chrome cache
-      // pollution causes a CORS error
-      if (e.message === 'Failed to fetch') {
-        console.warn(
-          `refetching ${this.url} to try to avoid cache pollution related cors error`,
-        )
-        response = await this.fetch(this.url, { ...args, cache: 'reload' })
-      }
-    }
+    const response = await this.fetch(this.url, args)
 
     if (!response) {
       throw new Error('generic-filehandle failed to fetch')
