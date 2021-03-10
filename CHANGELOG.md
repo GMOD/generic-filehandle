@@ -1,3 +1,7 @@
+# [2.1.0](https://github.com/GMOD/generic-filehandle/compare/v2.0.3...v2.1.0) (2021-03-10)
+
+
+
 - Refetch with cache:'reload' header on CORS error to bypass Chrome cache pollution
 
 ## [2.0.3](https://github.com/GMOD/generic-filehandle/compare/v2.0.2...v2.0.3) (2020-06-05)
