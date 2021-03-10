@@ -136,7 +136,7 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.alloc(10)
     const res = f.read(buf, 0, 0, 0)
-    await expect(res).rejects.toThrow(/fetching/)
+    await expect(res).rejects.toThrow(/Internal Server Error/)
   })
   it('throws error if file missing', async () => {
     fetchMock.mock('http://fakehost/test.txt', 404)
