@@ -1,4 +1,5 @@
 import uri2path from 'file-uri-to-path'
+import myGlobal from 'global-object'
 import {
   GenericFilehandle,
   FilehandleOptions,
@@ -7,13 +8,6 @@ import {
   PolyfilledResponse,
 } from './filehandle'
 import { LocalFile } from '.'
-
-const myGlobal =
-  typeof window !== 'undefined'
-    ? window
-    : typeof self !== 'undefined'
-    ? self
-    : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
   private url: string
