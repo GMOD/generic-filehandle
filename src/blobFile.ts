@@ -68,7 +68,7 @@ export default class BlobFile implements GenericFilehandle {
     buffer: Buffer,
     offset = 0,
     length: number,
-    position = 0,
+    position = 0
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     // short-circuit a read of 0 bytes here, because browsers actually sometimes
     // crash if you try to read 0 bytes from a local file!
@@ -87,7 +87,9 @@ export default class BlobFile implements GenericFilehandle {
     return { bytesRead: bytesCopied, buffer: resultBuffer }
   }
 
-  public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+  public async readFile(
+    options?: FilehandleOptions | string
+  ): Promise<Buffer | string> {
     let encoding
     if (typeof options === 'string') {
       encoding = options

@@ -31,14 +31,22 @@ export default class LocalFile implements GenericFilehandle {
     buffer: Buffer,
     offset = 0,
     length: number,
-    position = 0,
+    position = 0
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const fetchLength = Math.min(buffer.length - offset, length)
-    const ret = await fsRead(await this.getFd(), buffer, offset, fetchLength, position)
+    const ret = await fsRead(
+      await this.getFd(),
+      buffer,
+      offset,
+      fetchLength,
+      position
+    )
     return { bytesRead: ret, buffer }
   }
 
-  public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+  public async readFile(
+    options?: FilehandleOptions | string
+  ): Promise<Buffer | string> {
     return fsReadFile(this.filename, options)
   }
   // todo memoize

@@ -21,7 +21,9 @@ export default class RemoteFile implements GenericFilehandle {
   private fetchImplementation: Fetcher
   private baseOverrides: any = {}
 
-  private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
+  private async getBufferFromResponse(
+    response: PolyfilledResponse
+  ): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
       return response.buffer()
     } else if (typeof response.arrayBuffer === 'function') {
@@ -29,7 +31,7 @@ export default class RemoteFile implements GenericFilehandle {
       return Buffer.from(resp)
     } else {
       throw new TypeError(
-        'invalid HTTP response object, has no buffer method, and no arrayBuffer method',
+        'invalid HTTP response object, has no buffer method, and no arrayBuffer method'
       )
     }
   }
@@ -55,10 +57,11 @@ export default class RemoteFile implements GenericFilehandle {
       return
     }
 
-    const fetch = opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
+    const fetch =
+      opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
     if (!fetch) {
       throw new TypeError(
-        `no fetch function supplied, and none found in global environment`,
+        `no fetch function supplied, and none found in global environment`
       )
     }
     if (opts.overrides) {
@@ -69,7 +72,7 @@ export default class RemoteFile implements GenericFilehandle {
 
   public async fetch(
     input: RequestInfo,
-    init: RequestInit | undefined,
+    init: RequestInit | undefined
   ): Promise<PolyfilledResponse> {
     let response
     try {
@@ -80,9 +83,12 @@ export default class RemoteFile implements GenericFilehandle {
         // which the chrome cache returns a CORS error for content in its cache.
         // see also https://github.com/GMOD/jbrowse-components/pull/1511
         console.warn(
-          `generic-filehandle: refetching ${input} to attempt to work around chrome CORS header caching bug`,
+          `generic-filehandle: refetching ${input} to attempt to work around chrome CORS header caching bug`
         )
-        response = await this.fetchImplementation(input, { ...init, cache: 'reload' })
+        response = await this.fetchImplementation(input, {
+          ...init,
+          cache: 'reload',
+        })
       } else {
         throw e
       }
@@ -95,7 +101,7 @@ export default class RemoteFile implements GenericFilehandle {
     offset = 0,
     length: number,
     position = 0,
-    opts: FilehandleOptions = {},
+    opts: FilehandleOptions = {}
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const { headers = {}, signal, overrides = {} } = opts
     if (length < Infinity) {
@@ -106,7 +112,11 @@ export default class RemoteFile implements GenericFilehandle {
     const args = {
       ...this.baseOverrides,
       ...overrides,
-      headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
+      headers: {
+        ...headers,
+        ...overrides.headers,
+        ...this.baseOverrides.headers,
+      },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
@@ -118,13 +128,16 @@ export default class RemoteFile implements GenericFilehandle {
       throw new Error(`HTTP ${response.status} ${response.statusText}`)
     }
 
-    if ((response.status === 200 && position === 0) || response.status === 206) {
+    if (
+      (response.status === 200 && position === 0) ||
+      response.status === 206
+    ) {
       const responseData = await this.getBufferFromResponse(response)
       const bytesCopied = responseData.copy(
         buffer,
         offset,
         0,
-        Math.min(length, responseData.length),
+        Math.min(length, responseData.length)
       )
 
       // try to parse out the size of the remote file
@@ -146,7 +159,7 @@ export default class RemoteFile implements GenericFilehandle {
   }
 
   public async readFile(
-    options: FilehandleOptions | string = {},
+    options: FilehandleOptions | string = {}
   ): Promise<Buffer | string> {
     let encoding
     let opts
@@ -175,9 +188,12 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status !== 200) {
-      throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
-        status: response.status,
-      })
+      throw Object.assign(
+        new Error(`HTTP ${response.status} fetching ${this.url}`),
+        {
+          status: response.status,
+        }
+      )
     }
     if (encoding === 'utf8') {
       return response.text()

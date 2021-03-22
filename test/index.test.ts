@@ -20,7 +20,8 @@ describe('test util functions', () => {
     })
     const f = new LocalFile('/var')
     expect(
-      open('http://google.com', undefined, undefined, { fetch }).constructor.name,
+      open('http://google.com', undefined, undefined, { fetch }).constructor
+        .name
     ).toEqual('RemoteFile')
     expect(open(undefined, '/var/').constructor.name).toEqual('LocalFile')
     expect(open(undefined, undefined, f).constructor.name).toEqual('LocalFile')

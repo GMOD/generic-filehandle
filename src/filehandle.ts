@@ -1,6 +1,6 @@
 export type Fetcher = (
   input: RequestInfo,
-  init?: RequestInit,
+  init?: RequestInit
 ) => Promise<PolyfilledResponse>
 
 /**
@@ -39,7 +39,7 @@ export interface GenericFilehandle {
     offset: number,
     length: number,
     position: number,
-    opts?: FilehandleOptions,
+    opts?: FilehandleOptions
   ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
   stat(): Promise<Stats>
