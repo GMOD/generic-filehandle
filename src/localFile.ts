@@ -16,7 +16,7 @@ export default class LocalFile implements GenericFilehandle {
   private filename: string
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public constructor(source: string, opts: FilehandleOptions = {}) {
+  public constructor(source: string, _opts: FilehandleOptions = {}) {
     this.filename = source
   }
 
