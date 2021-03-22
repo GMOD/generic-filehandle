@@ -151,7 +151,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status === 200) {
-      throw new Error('${this.url} fetch returned status 200, expected 206')
+      throw new Error(`${this.url} fetch returned status 200, expected 206`)
     }
 
     // TODO: try harder here to gather more information about what the problem is
