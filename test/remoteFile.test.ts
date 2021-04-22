@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import fetchMock from 'fetch-mock'
-import { LocalFile, RemoteFile } from '../src/'
+import { FilehandleOptions, LocalFile, RemoteFile } from '../src/'
 import tenaciousFetch from 'tenacious-fetch'
 
 import rangeParser from 'range-parser'
@@ -10,7 +10,7 @@ fetchMock.config.sendAsJson = false
 const getFile = (url: string) =>
   new LocalFile(require.resolve(url.replace('http://fakehost/', './data/')))
 // fakes server responses from local file object with fetchMock
-const readBuffer = async (url: string, args: any) => {
+const readBuffer = async (url: string, args: FilehandleOptions) => {
   const file = getFile(url)
   const range = rangeParser(10000, args.headers.range)
   const { start, end } = range[0]
@@ -177,7 +177,7 @@ describe('remote file tests', () => {
     expect(stat.size).toEqual(8)
   })
   it('auth token', async () => {
-    fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
+    fetchMock.mock('http://fakehost/test.txt', (url: string, args: FilehandleOptions) => {
       if (args.headers.Authorization) {
         return {
           status: 200,
@@ -194,7 +194,7 @@ describe('remote file tests', () => {
     expect(stat).toBe('hello world')
   })
   it('auth token with range request', async () => {
-    fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
+    fetchMock.mock('http://fakehost/test.txt', (url: string, args: FilehandleOptions) => {
       if (args.headers.Authorization && args.headers.range) {
         return {
           status: 206,

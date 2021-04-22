@@ -21,7 +21,7 @@ export interface FilehandleOptions {
   signal?: AbortSignal
   headers?: Record<string, string>
   overrides?: Overrides
-  flag?: string | number
+  flag?: string
   encoding?: BufferEncoding | null
   /**
    * fetch function to use for HTTP requests. defaults to environment's
@@ -33,7 +33,6 @@ export interface FilehandleOptions {
 
 export interface Stats {
   size: number
-  [key: string]: any
 }
 
 export interface GenericFilehandle {

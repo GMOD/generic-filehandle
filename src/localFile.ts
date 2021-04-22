@@ -1,4 +1,4 @@
-import type { promises } from 'fs'
+import type fsTypes from 'fs'
 import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 // eslint-disable-next-line @typescript-eslint/camelcase, no-var
 declare var __webpack_require__: unknown
@@ -8,7 +8,7 @@ declare var __webpack_require__: unknown
 const fs = typeof __webpack_require__ !== 'function' ? require('fs') : undefined
 
 export default class LocalFile implements GenericFilehandle {
-  private fh?: promises.FileHandle
+  private fh?: fsTypes.promises.FileHandle
   private filename: string
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
@@ -18,7 +18,7 @@ export default class LocalFile implements GenericFilehandle {
     }
   }
 
-  private async getFh(): Promise<promises.FileHandle> {
+  private async getFh(): Promise<fsTypes.promises.FileHandle> {
     const fh = this.fh
     if (!fh) {
       const newFh = await fs.promises.open(this.filename, 'r')
@@ -39,9 +39,14 @@ export default class LocalFile implements GenericFilehandle {
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+    if (this.fh) {
+      // need to reopen the file to match previous behavior of reading the whole file
+      // regardless of previous reads
+      await this.fh.close()
+      this.fh = undefined
+    }
     const fh = await this.getFh()
-    const ret = fh.readFile(options)
-    return ret
+    return fh.readFile(options)
   }
   // todo memoize
   public async stat(): Promise<Stats> {

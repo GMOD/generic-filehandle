@@ -8,6 +8,7 @@ describe('remote file with file urls', () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
     const b = await f.readFile()
     expect(b.toString()).toEqual('testing\n')
+    await f.close()
   })
   it('reads file with encoding', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
@@ -16,6 +17,7 @@ describe('remote file with file urls', () => {
     const fileText2 = await f.readFile({ encoding: 'utf8' })
     expect(fileText2).toEqual('testing\n')
     await expect(f.readFile('fakeEncoding')).rejects.toThrow(/encoding/)
+    await f.close()
   })
   it('reads remote partially', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
@@ -23,6 +25,7 @@ describe('remote file with file urls', () => {
     const { bytesRead } = await f.read(buf, 0, 3, 0)
     expect(buf.toString()).toEqual('tes')
     expect(bytesRead).toEqual(3)
+    await f.close()
   })
   it('reads remote clipped at the end', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
@@ -30,6 +33,7 @@ describe('remote file with file urls', () => {
     const { bytesRead } = await f.read(buf, 0, 3, 6)
     expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
     expect(bytesRead).toEqual(2)
+    await f.close()
   })
   it('length infinity', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
@@ -37,6 +41,7 @@ describe('remote file with file urls', () => {
     const { bytesRead } = await f.read(buf, 0, Infinity, 3)
     expect(buf.toString()).toEqual('ting\n')
     expect(bytesRead).toEqual(5)
+    await f.close()
   })
   it('zero read', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
@@ -45,16 +50,19 @@ describe('remote file with file urls', () => {
     expect(buf.toString().length).toBe(10)
     expect(buf.toString()[0]).toBe('\0')
     expect(bytesRead).toEqual(0)
+    await f.close()
   })
   it('stat', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
     const stat = await f.stat()
     expect(stat.size).toEqual(8)
+    await f.close()
   })
 
   it('opens nonexistent file but fails on first fetch', async () => {
     const f = new RemoteFile(`${fileUrlBase}/stairmaster.txt`)
     const stat = f.stat()
     await expect(stat).rejects.toThrow(/ENOENT/)
+    await f.close()
   })
 })
