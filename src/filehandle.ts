@@ -12,14 +12,17 @@ export interface PolyfilledResponse extends Response {
   buffer?: Function | void
 }
 
+export type Overrides = Record<string, unknown> & { headers?: HeadersInit}
+
 export interface FilehandleOptions {
   /**
    * optional AbortSignal object for aborting the request
    */
   signal?: AbortSignal
-  headers?: any
-  overrides?: any
-  encoding?: string | null
+  headers?: Record<string, string>
+  overrides?: Overrides,
+  flag?: string | number,
+  encoding?: BufferEncoding | null
   /**
    * fetch function to use for HTTP requests. defaults to environment's
    * global fetch. if there is no global fetch, and a fetch function is not provided,

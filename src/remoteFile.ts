@@ -5,6 +5,7 @@ import {
   Stats,
   Fetcher,
   PolyfilledResponse,
+  Overrides,
 } from './filehandle'
 import { LocalFile } from '.'
 
@@ -19,7 +20,7 @@ export default class RemoteFile implements GenericFilehandle {
   private url: string
   private _stat?: Stats
   private fetchImplementation: Fetcher
-  private baseOverrides: any = {}
+  private baseOverrides: Overrides = {}
 
   private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
@@ -47,7 +48,6 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       this.fetchImplementation = (): void => {
         /* intentionally blank */
@@ -103,7 +103,7 @@ export default class RemoteFile implements GenericFilehandle {
     } else if (length === Infinity && position !== 0) {
       headers.range = `bytes=${position}-`
     }
-    const args = {
+    const args: RequestInit = {
       ...this.baseOverrides,
       ...overrides,
       headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
@@ -159,7 +159,7 @@ export default class RemoteFile implements GenericFilehandle {
       delete opts.encoding
     }
     const { headers = {}, signal, overrides = {} } = opts
-    const args = {
+    const args: RequestInit = {
       headers,
       method: 'GET',
       redirect: 'follow',

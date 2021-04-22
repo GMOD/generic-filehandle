@@ -1,30 +1,29 @@
-import { promisify } from 'es6-promisify'
+import type { promises } from 'fs'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
-// eslint-disable-next-line @typescript-eslint/camelcase,no-var
-declare var __webpack_require__: any
+// eslint-disable-next-line @typescript-eslint/camelcase
+declare var __webpack_require__: unknown
 
 // don't load fs native module if running in webpacked code
-const fs = typeof __webpack_require__ !== 'function' ? require('fs') : null // eslint-disable-line @typescript-eslint/camelcase
-
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
+const fs = typeof __webpack_require__ !== 'function' ? require('fs') : undefined
 
 export default class LocalFile implements GenericFilehandle {
-  private fd?: any
+  private fh?: promises.FileHandle
   private filename: string
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.filename = source
+    if (opts.flag && opts.flag !== 'r')
+      throw new Error(`filehandle flags ${opts.flag} not supported by LocalFile`)
   }
 
-  private getFd(): any {
-    if (!this.fd) {
-      this.fd = fsOpen(this.filename, 'r')
+  private async getFh(): Promise<promises.FileHandle> {
+    let fh = this.fh
+    if (!fh) {
+      let newFh = await fs.promises.open(this.filename,'r')
+      this.fh = newFh
+      return newFh
     }
-    return this.fd
+    return fh
   }
 
   public async read(
@@ -34,15 +33,21 @@ export default class LocalFile implements GenericFilehandle {
     position = 0,
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const fetchLength = Math.min(buffer.length - offset, length)
-    const ret = await fsRead(await this.getFd(), buffer, offset, fetchLength, position)
-    return { bytesRead: ret, buffer }
+    return (await this.getFh()).read(buffer, offset, fetchLength, position)
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
-    return fsReadFile(this.filename, options)
+    const fh = await this.getFh()
+    const ret = fh.readFile(options)
+    return ret
   }
   // todo memoize
-  public async stat(): Promise<any> {
-    return fsFStat(await this.getFd())
+  public async stat() {
+    return (await this.getFh()).stat()
   }
+
+  public async close() {
+    return this.fh?.close()
+  }
+
 }

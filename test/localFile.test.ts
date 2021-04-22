@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { LocalFile } from '../src/'
 
 describe('local file tests', () => {
@@ -7,7 +6,17 @@ describe('local file tests', () => {
     const b = await f.readFile()
     expect(b.toString()).toEqual('testing\n')
   })
-  it('reads file with encoding', async () => {
+  it('reads file with encoding as string', async () => {
+    const f = new LocalFile(require.resolve('./data/test.txt'))
+    const fileText = await f.readFile('utf8')
+    expect(fileText).toEqual('testing\n')
+  })
+  it('reads file with encoding as option', async () => {
+    const f = new LocalFile(require.resolve('./data/test.txt'))
+    const fileText2 = await f.readFile({ encoding: 'utf8' })
+    expect(fileText2).toEqual('testing\n')
+  })
+  it('reads file twice with encoding', async () => {
     const f = new LocalFile(require.resolve('./data/test.txt'))
     const fileText = await f.readFile('utf8')
     expect(fileText).toEqual('testing\n')
