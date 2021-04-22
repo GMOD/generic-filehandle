@@ -1,9 +1,10 @@
 import type { promises } from 'fs'
-import { GenericFilehandle, FilehandleOptions } from './filehandle'
-// eslint-disable-next-line @typescript-eslint/camelcase
+import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
+// eslint-disable-next-line @typescript-eslint/camelcase, no-var
 declare var __webpack_require__: unknown
 
 // don't load fs native module if running in webpacked code
+// eslint-disable-next-line @typescript-eslint/camelcase
 const fs = typeof __webpack_require__ !== 'function' ? require('fs') : undefined
 
 export default class LocalFile implements GenericFilehandle {
@@ -12,14 +13,15 @@ export default class LocalFile implements GenericFilehandle {
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.filename = source
-    if (opts.flag && opts.flag !== 'r')
+    if (opts.flag && opts.flag !== 'r') {
       throw new Error(`filehandle flags ${opts.flag} not supported by LocalFile`)
+    }
   }
 
   private async getFh(): Promise<promises.FileHandle> {
-    let fh = this.fh
+    const fh = this.fh
     if (!fh) {
-      let newFh = await fs.promises.open(this.filename,'r')
+      const newFh = await fs.promises.open(this.filename, 'r')
       this.fh = newFh
       return newFh
     }
@@ -42,12 +44,11 @@ export default class LocalFile implements GenericFilehandle {
     return ret
   }
   // todo memoize
-  public async stat() {
+  public async stat(): Promise<Stats> {
     return (await this.getFh()).stat()
   }
 
-  public async close() {
+  public async close(): Promise<void> {
     return this.fh?.close()
   }
-
 }

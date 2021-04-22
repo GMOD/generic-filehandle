@@ -48,6 +48,7 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       this.fetchImplementation = (): void => {
         /* intentionally blank */
@@ -197,5 +198,9 @@ export default class RemoteFile implements GenericFilehandle {
       }
     }
     return this._stat
+  }
+
+  public async close(): Promise<void> {
+    return
   }
 }

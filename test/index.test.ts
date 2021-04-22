@@ -25,5 +25,6 @@ describe('test util functions', () => {
     expect(open(undefined, '/var/').constructor.name).toEqual('LocalFile')
     expect(open(undefined, undefined, f).constructor.name).toEqual('LocalFile')
     expect(() => open(undefined, undefined, undefined)).toThrow(/cannot open/)
+    await f.close()
   })
 })

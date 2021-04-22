@@ -12,7 +12,7 @@ export interface PolyfilledResponse extends Response {
   buffer?: Function | void
 }
 
-export type Overrides = Record<string, unknown> & { headers?: HeadersInit}
+export type Overrides = Record<string, unknown> & { headers?: HeadersInit }
 
 export interface FilehandleOptions {
   /**
@@ -20,8 +20,8 @@ export interface FilehandleOptions {
    */
   signal?: AbortSignal
   headers?: Record<string, string>
-  overrides?: Overrides,
-  flag?: string | number,
+  overrides?: Overrides
+  flag?: string | number
   encoding?: BufferEncoding | null
   /**
    * fetch function to use for HTTP requests. defaults to environment's
@@ -46,4 +46,5 @@ export interface GenericFilehandle {
   ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
   stat(): Promise<Stats>
+  close(): Promise<void>
 }
