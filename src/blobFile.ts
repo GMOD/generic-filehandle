@@ -107,4 +107,8 @@ export default class BlobFile implements GenericFilehandle {
   public async stat(): Promise<Stats> {
     return { size: this.size }
   }
+
+  public async close(): Promise<void> {
+    return
+  }
 }

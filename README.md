@@ -60,6 +60,9 @@ Returns a Promise for a buffer or string containing the contents of the whole fi
 
 Returns a Promise for an object containing as much information about the file as is available. At minimum, the `size` of the file will be present.
 
+### async close() : Promise<void>
+
+Closes the filehandle.
 ### Options
 
 The Options object for the constructor, `read` and `readFile` can contain abort signal

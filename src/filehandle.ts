@@ -43,4 +43,5 @@ export interface GenericFilehandle {
   ): Promise<{ bytesRead: number; buffer: Buffer }>
   readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
   stat(): Promise<Stats>
+  close(): Promise<void>
 }

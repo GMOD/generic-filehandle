@@ -198,4 +198,8 @@ export default class RemoteFile implements GenericFilehandle {
     }
     return this._stat
   }
+
+  public async close(): Promise<void> {
+    return
+  }
 }
