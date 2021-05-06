@@ -6,10 +6,10 @@ declare var __webpack_require__: any
 // don't load fs native module if running in webpacked code
 const fs = typeof __webpack_require__ !== 'function' ? require('fs') : null // eslint-disable-line @typescript-eslint/camelcase
 
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
+const fsOpen = fs && fs.open && promisify(fs.open)
+const fsRead = fs && fs.read && promisify(fs.read)
+const fsFStat = fs && fs.fstat && promisify(fs.fstat)
+const fsReadFile = fs && fs.readFile && promisify(fs.readFile)
 
 export default class LocalFile implements GenericFilehandle {
   private fd?: any
