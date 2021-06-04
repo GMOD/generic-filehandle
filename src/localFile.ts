@@ -1,17 +1,37 @@
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
 export default class LocalFile implements GenericFilehandle {
+  private fdPromise?: Promise<number>
   private filename: string
-  private fsPromisesPromise: Promise<typeof import('fs').promises>
-  private fileHandlePromise: Promise<import('fs').promises.FileHandle>
+  private fsOpenPromise: Promise<typeof import('fs').open.__promisify__>
+  private fsReadPromise: Promise<typeof import('fs').read.__promisify__>
+  private fsReadFilePromise: Promise<typeof import('fs').readFile.__promisify__>
+  private fsStatPromise: Promise<typeof import('fs').stat.__promisify__>
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.filename = source
-    this.fsPromisesPromise = import('fs').then((fs) => fs.promises)
-    this.fileHandlePromise = this.fsPromisesPromise.then((fsPromises) =>
-      fsPromises.open(source, 'r'),
+    const utilPromise = import('util')
+    const fsPromise = import('fs')
+    this.fsOpenPromise = Promise.all([utilPromise, fsPromise]).then(([util, fs]) =>
+      util.promisify(fs.open),
     )
+    this.fsReadPromise = Promise.all([utilPromise, fsPromise]).then(([util, fs]) =>
+      util.promisify(fs.read),
+    )
+    this.fsReadFilePromise = Promise.all([utilPromise, fsPromise]).then(([util, fs]) =>
+      util.promisify(fs.readFile),
+    )
+    this.fsStatPromise = Promise.all([utilPromise, fsPromise]).then(([util, fs]) =>
+      util.promisify(fs.stat),
+    )
+  }
+
+  private async getFd(): Promise<number> {
+    if (!this.fdPromise) {
+      this.fdPromise = (await this.fsOpenPromise)(this.filename, 'r')
+    }
+    return this.fdPromise
   }
 
   public async read(
@@ -20,17 +40,16 @@ export default class LocalFile implements GenericFilehandle {
     length: number,
     position = 0,
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
-    return (await this.fileHandlePromise).read(buffer, offset, length, position)
+    const fetchLength = Math.min(buffer.length - offset, length)
+    const fd = await this.getFd()
+    return (await this.fsReadPromise)(fd, buffer, offset, fetchLength, position)
   }
 
   public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
-    // Don't use (await this.fileHandlePromise).readFile() here because it moves
-    // the fileHandle's file position, which makes it so that readFile can only
-    // be called once.
-    return (await this.fsPromisesPromise).readFile(this.filename, options)
+    return (await this.fsReadFilePromise)(this.filename, options)
   }
   // todo memoize
-  public async stat(): Promise<any> {
-    return (await this.fileHandlePromise).stat()
+  public async stat(): Promise<import('fs').Stats> {
+    return (await this.fsStatPromise)(this.filename)
   }
 }

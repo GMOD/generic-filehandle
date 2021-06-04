@@ -123,6 +123,14 @@ describe('remote file tests', () => {
     expect((await f.read(buf, 3, 3, 6)).bytesRead).toEqual(0) // test writing fully past end of buf
     expect((await f.read(buf, 2, 3, 6)).bytesRead).toEqual(1) // test writing partially past end of buf
   })
+  it('length infinity', async () => {
+    fetchMock.mock('http://fakehost/test.txt', readBuffer)
+    const f = new RemoteFile('http://fakehost/test.txt')
+    const buf = Buffer.allocUnsafe(5)
+    const { bytesRead } = await f.read(buf, 0, Infinity, 3)
+    expect(buf.toString()).toEqual('ting\n')
+    expect(bytesRead).toEqual(5)
+  })
   it('throws error', async () => {
     fetchMock.mock('http://fakehost/test.txt', 500)
     const f = new RemoteFile('http://fakehost/test.txt')

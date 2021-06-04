@@ -21,6 +21,13 @@ describe('local file tests', () => {
     expect(buf.toString()).toEqual('tes')
     expect(bytesRead).toEqual(3)
   })
+  it('length infinity', async () => {
+    const f = new LocalFile(require.resolve('./data/test.txt'))
+    const buf = Buffer.allocUnsafe(5)
+    const { bytesRead } = await f.read(buf, 0, Infinity, 3)
+    expect(buf.toString()).toEqual('ting\n')
+    expect(bytesRead).toEqual(5)
+  })
   it('zero read', async () => {
     const f = new LocalFile(require.resolve('./data/test.txt'))
     const buf = Buffer.alloc(10)

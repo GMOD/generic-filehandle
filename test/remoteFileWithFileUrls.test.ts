@@ -31,6 +31,13 @@ describe('remote file with file urls', () => {
     expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
     expect(bytesRead).toEqual(2)
   })
+  it('length infinity', async () => {
+    const f = new RemoteFile(`${fileUrlBase}/test.txt`)
+    const buf = Buffer.allocUnsafe(5)
+    const { bytesRead } = await f.read(buf, 0, Infinity, 3)
+    expect(buf.toString()).toEqual('ting\n')
+    expect(bytesRead).toEqual(5)
+  })
   it('zero read', async () => {
     const f = new RemoteFile(`${fileUrlBase}/test.txt`)
     const buf = Buffer.alloc(10)
