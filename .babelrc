@@ -16,12 +16,6 @@
     ]
   ],
   "plugins": [
-    [
-      "@babel/transform-runtime",
-      {
-        "regenerator": true
-      }
-    ],
-    "@babel/proposal-class-properties"
+    "@babel/transform-runtime"
   ]
 }
