@@ -19,7 +19,7 @@ export interface FilehandleOptions {
   signal?: AbortSignal
   headers?: any
   overrides?: any
-  encoding?: string | null
+  encoding?: BufferEncoding | null
   /**
    * fetch function to use for HTTP requests. defaults to environment's
    * global fetch. if there is no global fetch, and a fetch function is not provided,
@@ -41,6 +41,6 @@ export interface GenericFilehandle {
     position: number,
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Buffer }>
-  readFile(options?: FilehandleOptions | string): Promise<Buffer | string>
+  readFile(options?: FilehandleOptions | BufferEncoding): Promise<Buffer | string>
   stat(): Promise<Stats>
 }

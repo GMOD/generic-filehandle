@@ -13,6 +13,12 @@ const getFile = (url: string) =>
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)
   const range = rangeParser(10000, args.headers.range)
+  if (range === -1) {
+    throw new Error('Range unsatisfiable')
+  }
+  if (range === -2) {
+    throw new Error('Range syntactically invalid')
+  }
   const { start, end } = range[0]
   const len = end - start
   let buf = Buffer.alloc(len)
@@ -153,6 +159,8 @@ describe('remote file tests', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         res.buffer = undefined // obscure the buffer method to test our arraybuffer parse
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
         res.arrayBuffer = undefined // also obscure arrayBuffer
         return res
       },
@@ -177,7 +185,7 @@ describe('remote file tests', () => {
     expect(stat.size).toEqual(8)
   })
   it('auth token', async () => {
-    fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
+    fetchMock.mock('http://fakehost/test.txt', (_url: string, args: any) => {
       if (args.headers.Authorization) {
         return {
           status: 200,
@@ -194,7 +202,7 @@ describe('remote file tests', () => {
     expect(stat).toBe('hello world')
   })
   it('auth token with range request', async () => {
-    fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
+    fetchMock.mock('http://fakehost/test.txt', (_url: string, args: any) => {
       if (args.headers.Authorization && args.headers.range) {
         return {
           status: 206,
@@ -205,6 +213,7 @@ describe('remote file tests', () => {
       } else if (!args.headers.Range) {
         return { status: 400 }
       }
+      throw new Error('Unknown status')
     })
     const f = new RemoteFile('http://fakehost/test.txt', {
       overrides: { headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' } },
