@@ -1,0 +1,8 @@
+{
+  "main": "dist/generic-filehandle-browser.cjs.js",
+  "module": "dist/generic-filehandle-browser.esm.js",
+  "browser": {
+    "./dist/generic-filehandle-browser.cjs.js": "./dist/generic-filehandle-browser.browser.cjs.js",
+    "./dist/generic-filehandle-browser.esm.js": "./dist/generic-filehandle-browser.browser.esm.js"
+  }
+}

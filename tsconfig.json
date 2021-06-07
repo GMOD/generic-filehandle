@@ -3,14 +3,11 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./dist",
     "strict": true,
     "removeComments": false,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
-  },
-  "include": [
-    "src"
-  ]
+    "esModuleInterop": true,
+    "isolatedModules": true
+  }
 }

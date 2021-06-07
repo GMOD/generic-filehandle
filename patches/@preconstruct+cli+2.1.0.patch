@@ -1,0 +1,57 @@
+diff --git a/node_modules/@preconstruct/cli/cli/dist/cli.cjs.dev.js b/node_modules/@preconstruct/cli/cli/dist/cli.cjs.dev.js
+index 4d5ffb0..bbb4a18 100644
+--- a/node_modules/@preconstruct/cli/cli/dist/cli.cjs.dev.js
++++ b/node_modules/@preconstruct/cli/cli/dist/cli.cjs.dev.js
+@@ -868,7 +868,7 @@ function validateEntrypoint(entrypoint, log) {
+
+   const fatalErrors = [];
+
+-  for (const field of ["main", "module", "umd:main", "browser"]) {
++  for (const field of ["main", "module", "umd:main"]) {
+     if (field !== "main" && entrypoint.json[field] === undefined) {
+       continue;
+     }
+@@ -1970,16 +1970,9 @@ let getRollupConfig = (pkg, entrypoints, aliases, type, reportTransformedFile) =
+         case "EMPTY_BUNDLE":
+         case "EVAL":
+         case "UNUSED_EXTERNAL_IMPORT":
+-          {
+-            break;
+-          }
+-
+         case "UNRESOLVED_IMPORT":
+           {
+-            if (!warning.source.startsWith(".")) {
+-              warnings.push(new FatalError(`"${warning.source}" is imported by "${normalizePath(path__default.relative(pkg.directory, warning.importer))}" but the package is not specified in dependencies or peerDependencies`, pkg.name));
+-              return;
+-            }
++            break;
+           }
+
+         case "THIS_IS_UNDEFINED":
+diff --git a/node_modules/@preconstruct/cli/cli/dist/cli.cjs.prod.js b/node_modules/@preconstruct/cli/cli/dist/cli.cjs.prod.js
+index 604d0bc..da943ea 100644
+--- a/node_modules/@preconstruct/cli/cli/dist/cli.cjs.prod.js
++++ b/node_modules/@preconstruct/cli/cli/dist/cli.cjs.prod.js
+@@ -597,7 +597,7 @@ let projectsShownOldDistNamesInfo = new WeakSet;
+ function validateEntrypoint(entrypoint, log) {
+   log && info(infos.validEntrypoint, entrypoint.name);
+   const fatalErrors = [];
+-  for (const field of [ "main", "module", "umd:main", "browser" ]) if ("main" === field || void 0 !== entrypoint.json[field]) {
++  for (const field of [ "main", "module", "umd:main" ]) if ("main" === field || void 0 !== entrypoint.json[field]) {
+     if (!isFieldValid[field](entrypoint)) {
+       let isUsingOldDistFilenames = validFields[field](entrypoint, "unscoped-package-name") === entrypoint.json[field];
+       isUsingOldDistFilenames && !projectsShownOldDistNamesInfo.has(entrypoint.package.project) && (projectsShownOldDistNamesInfo.add(entrypoint.package.project),
+@@ -1218,11 +1218,9 @@ let getRollupConfig = (pkg, entrypoints, aliases, type, reportTransformedFile) =
+        case "EMPTY_BUNDLE":
+        case "EVAL":
+        case "UNUSED_EXTERNAL_IMPORT":
++         case "UNRESOLVED_IMPORT":
+         break;
+
+-       case "UNRESOLVED_IMPORT":
+-        if (!warning.source.startsWith(".")) return void warnings.push(new FatalError(`"${warning.source}" is imported by "${normalizePath(path__default.relative(pkg.directory, warning.importer))}" but the package is not specified in dependencies or peerDependencies`, pkg.name));
+-
+        case "THIS_IS_UNDEFINED":
+         if ("umd" === type) return;
+         return void warnings.push(new FatalError(`"${normalizePath(path__default.relative(pkg.directory, warning.loc.file))}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url} and fix this issue that has happened here:\n\n${warning.frame}\n`, pkg.name));

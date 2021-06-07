@@ -2,8 +2,14 @@
   "name": "generic-filehandle",
   "description": "uniform interface for accessing binary data from local files, remote HTTP resources, and browser Blob data",
   "version": "2.1.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/generic-filehandle.cjs.js",
+  "module": "dist/generic-filehandle.esm.js",
+  "types": "dist/generic-filehandle.cjs.d.ts",
+  "browser": {
+    "./dist/generic-filehandle.cjs.js": "./browser/dist/generic-filehandle-browser.cjs.js",
+    "./dist/generic-filehandle.esm.js": "./browser/dist/generic-filehandle-browser.esm.js",
+    "./dist/generic-filehandle.cjs.d.ts": "./browser/dist/generic-filehandle-browser.cjs.d.ts"
+  },
   "repository": "GMOD/generic-filehandle",
   "license": "MIT",
   "author": {
@@ -12,10 +18,11 @@
     "url": "https://github.com/cmdcolin"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "files": [
-    "dist"
+    "dist",
+    "browser"
   ],
   "scripts": {
     "test": "jest",
@@ -23,13 +30,12 @@
     "lint": "eslint --ext .ts src test",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
-    "build": "npm run build:types && npm run build:js",
-    "watch": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline --watch",
+    "build": "preconstruct build",
+    "watch": "preconstruct watch",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
-    "postversion": "git push --follow-tags"
+    "postversion": "git push --follow-tags",
+    "postinstall": "patch-package"
   },
   "keywords": [
     "bionode",
@@ -37,25 +43,32 @@
     "ucsc",
     "genomics"
   ],
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts",
+      "browser.ts"
+    ]
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./test/setup.js"
+    ]
+  },
   "dependencies": {
-    "@babel/runtime": "^7.9.6",
-    "es6-promisify": "^6.1.1",
+    "@babel/runtime": "^7.14.0",
     "file-uri-to-path": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-typescript": "^7.3.3",
+    "@babel/plugin-transform-runtime": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "@babel/preset-typescript": "^7.13.0",
+    "@preconstruct/cli": "^2.1.0",
     "@types/fetch-mock": "^7.3.0",
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^26.0.0",
     "@types/node": "^13.13.5",
     "@types/range-parser": "^1.2.3",
     "@typescript-eslint/eslint-plugin": "^2.32.0",
     "@typescript-eslint/parser": "^2.32.0",
-    "babel-eslint": "^10.0.1",
     "cross-fetch": "^3.0.3",
     "eslint": "^7.0.0",
     "eslint-config-airbnb-base": "^14.1.0",
@@ -65,13 +78,14 @@
     "eslint-plugin-prettier": "^3.1.3",
     "fetch-mock": "^9.7.0",
     "jest": "^26.0.1",
+    "patch-package": "^6.4.7",
     "prettier": "^2.0.5",
     "range-parser": "^1.2.1",
+    "regenerator-runtime": "^0.13.7",
     "rimraf": "^3.0.2",
     "standard-changelog": "^2.0.24",
     "tenacious-fetch": "^2.3.0",
-    "ts-jest": "^25.5.1",
-    "typescript": "^3.5.1"
+    "typescript": "^4.3.2"
   },
   "publishConfig": {
     "access": "public"
