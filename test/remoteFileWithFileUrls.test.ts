@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { RemoteFile } from '../src'
+import { RemoteFile } from '../src/server'
 
 const fileUrlBase = `file://${process.cwd()}/test/data`
 

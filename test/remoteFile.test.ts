@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import fetchMock from 'fetch-mock'
-import { LocalFile, RemoteFile } from '../src/'
+import { RemoteFile } from '../src/'
+import { LocalFile } from '../src/server'
 import tenaciousFetch from 'tenacious-fetch'
 
 import rangeParser from 'range-parser'

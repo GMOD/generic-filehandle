@@ -1,5 +1,4 @@
-import LocalFile from './localFile'
-import RemoteFile from './remoteFileWithFileUrl'
+import RemoteFile from './remoteFile'
 import BlobFile from './blobFile'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 export * from './filehandle'
@@ -13,16 +12,18 @@ function open(
   maybeFilehandle?: GenericFilehandle,
   opts: FilehandleOptions = {},
 ): GenericFilehandle {
+  if (maybePath) {
+    throw new Error(
+      'cannot open from a path, please use "open" from "generic-filehandle/server" instead',
+    )
+  }
   if (maybeFilehandle !== undefined) {
     return maybeFilehandle
   }
   if (maybeUrl !== undefined) {
     return fromUrl(maybeUrl, opts)
   }
-  if (maybePath !== undefined) {
-    return new LocalFile(maybePath, opts)
-  }
-  throw new Error('no url, path, or filehandle provided, cannot open')
+  throw new Error('no url, or filehandle provided, cannot open')
 }
 
-export { open, fromUrl, RemoteFile, LocalFile, BlobFile }
+export { open, fromUrl, RemoteFile, BlobFile }

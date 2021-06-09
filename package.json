@@ -5,11 +5,6 @@
   "main": "dist/generic-filehandle.cjs.js",
   "module": "dist/generic-filehandle.esm.js",
   "types": "dist/generic-filehandle.cjs.d.ts",
-  "browser": {
-    "./dist/generic-filehandle.cjs.js": "./browser/dist/generic-filehandle-browser.cjs.js",
-    "./dist/generic-filehandle.esm.js": "./browser/dist/generic-filehandle-browser.esm.js",
-    "./dist/generic-filehandle.cjs.d.ts": "./browser/dist/generic-filehandle-browser.cjs.d.ts"
-  },
   "repository": "GMOD/generic-filehandle",
   "license": "MIT",
   "author": {
@@ -22,7 +17,7 @@
   },
   "files": [
     "dist",
-    "browser"
+    "server"
   ],
   "scripts": {
     "test": "jest",
@@ -34,8 +29,7 @@
     "watch": "preconstruct watch",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
-    "postversion": "git push --follow-tags",
-    "postinstall": "patch-package"
+    "postversion": "git push --follow-tags"
   },
   "keywords": [
     "bionode",
@@ -46,7 +40,7 @@
   "preconstruct": {
     "entrypoints": [
       "index.ts",
-      "browser.ts"
+      "server.ts"
     ]
   },
   "jest": {
@@ -78,7 +72,6 @@
     "eslint-plugin-prettier": "^3.1.3",
     "fetch-mock": "^9.7.0",
     "jest": "^26.0.1",
-    "patch-package": "^6.4.7",
     "prettier": "^2.0.5",
     "range-parser": "^1.2.1",
     "regenerator-runtime": "^0.13.7",

@@ -1,0 +1,4 @@
+{
+  "main": "dist/generic-filehandle-server.cjs.js",
+  "module": "dist/generic-filehandle-server.esm.js"
+}

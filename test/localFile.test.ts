@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { LocalFile } from '../src/'
+import { LocalFile } from '../src/server'
 
 describe('local file tests', () => {
   it('reads file', async () => {
