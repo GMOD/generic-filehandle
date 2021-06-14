@@ -10,6 +10,7 @@ const fsOpen = fs && promisify(fs.open)
 const fsRead = fs && promisify(fs.read)
 const fsFStat = fs && promisify(fs.fstat)
 const fsReadFile = fs && promisify(fs.readFile)
+const fsClose = fs && promisify(fs.close)
 
 export default class LocalFile implements GenericFilehandle {
   private fd?: any
@@ -44,5 +45,9 @@ export default class LocalFile implements GenericFilehandle {
   // todo memoize
   public async stat(): Promise<any> {
     return fsFStat(await this.getFd())
+  }
+
+  public async close(): Promise<void> {
+    return fsClose(await this.getFd())
   }
 }
