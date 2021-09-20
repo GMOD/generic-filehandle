@@ -1,10 +1,6 @@
+import fs from 'fs'
 import { promisify } from 'es6-promisify'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
-// eslint-disable-next-line @typescript-eslint/camelcase,no-var
-declare var __webpack_require__: any
-
-// don't load fs native module if running in webpacked code
-const fs = typeof __webpack_require__ !== 'function' ? require('fs') : null // eslint-disable-line @typescript-eslint/camelcase
 
 const fsOpen = fs && promisify(fs.open)
 const fsRead = fs && promisify(fs.read)
