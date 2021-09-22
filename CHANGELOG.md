@@ -1,6 +1,6 @@
+- Use "browser" field of package.json to hide localFile import of 'fs' instead of hiding behind webpack flag. Thanks to @manzt for contributing! (#88)
+
 # [2.1.0](https://github.com/GMOD/generic-filehandle/compare/v2.0.3...v2.1.0) (2021-03-10)
-
-
 
 - Refetch with cache:'reload' header on CORS error to bypass Chrome cache pollution
 
