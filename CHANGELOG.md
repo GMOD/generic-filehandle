@@ -1,13 +1,12 @@
-# [2.2.0](https://github.com/GMOD/generic-filehandle/compare/v2.1.0...v2.2.0) (2021-09-22)
+- Make this.url a protected instead of private field
 
+# [2.2.0](https://github.com/GMOD/generic-filehandle/compare/v2.1.0...v2.2.0) (2021-09-22)
 
 ### Features
 
-* resolve empty for node-specific modules in browser context ([#88](https://github.com/GMOD/generic-filehandle/issues/88)) ([044ab0f](https://github.com/GMOD/generic-filehandle/commit/044ab0f581c6937f98e309855e50f5102c0a94e8))
+- resolve empty for node-specific modules in browser context ([#88](https://github.com/GMOD/generic-filehandle/issues/88)) ([044ab0f](https://github.com/GMOD/generic-filehandle/commit/044ab0f581c6937f98e309855e50f5102c0a94e8))
 
-
-
-- Use "browser" field of package.json to hide localFile import of 'fs' instead of hiding behind webpack flag. Thanks to @manzt for contributing! (#88)
+* Use "browser" field of package.json to hide localFile import of 'fs' instead of hiding behind webpack flag. Thanks to @manzt for contributing! (#88)
 
 # [2.1.0](https://github.com/GMOD/generic-filehandle/compare/v2.0.3...v2.1.0) (2021-03-10)
 

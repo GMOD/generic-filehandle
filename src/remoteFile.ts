@@ -16,7 +16,7 @@ const myGlobal =
     : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
-  private url: string
+  protected url: string
   private _stat?: Stats
   private fetchImplementation: Fetcher
   private baseOverrides: any = {}
