@@ -1,3 +1,7 @@
+## [2.2.1](https://github.com/GMOD/generic-filehandle/compare/v2.2.0...v2.2.1) (2021-10-03)
+
+
+
 - Make this.url a protected instead of private field
 
 # [2.2.0](https://github.com/GMOD/generic-filehandle/compare/v2.1.0...v2.2.0) (2021-09-22)
