@@ -2,11 +2,16 @@ import fs from 'fs'
 import { promisify } from 'es6-promisify'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
-const fsClose = fs && promisify(fs.close)
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fsOpen = fs && promisify(fs.open || (() => {}))
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fsRead = fs && promisify(fs.read || (() => {}))
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fsFStat = fs && promisify(fs.fstat || (() => {}))
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fsReadFile = fs && promisify(fs.readFile || (() => {}))
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const fsClose = fs && promisify(fs.close || (() => {}))
 
 export default class LocalFile implements GenericFilehandle {
   private fd?: any
