@@ -35,7 +35,19 @@ export default class LocalFile implements GenericFilehandle {
     return { bytesRead: ret, buffer }
   }
 
-  public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+  public async readFile(): Promise<Buffer>
+  public async readFile(options: BufferEncoding): Promise<string>
+  public async readFile<T extends undefined>(
+    options:
+      | Omit<FilehandleOptions, 'encoding'>
+      | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
+  ): Promise<Buffer>
+  public async readFile<T extends BufferEncoding>(
+    options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
+  ): Promise<string>
+  public async readFile(
+    options?: FilehandleOptions | BufferEncoding,
+  ): Promise<Buffer | string> {
     return fsReadFile(this.filename, options)
   }
   // todo memoize

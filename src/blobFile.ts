@@ -87,7 +87,19 @@ export default class BlobFile implements GenericFilehandle {
     return { bytesRead: bytesCopied, buffer: resultBuffer }
   }
 
-  public async readFile(options?: FilehandleOptions | string): Promise<Buffer | string> {
+  public async readFile(): Promise<Buffer>
+  public async readFile(options: BufferEncoding): Promise<string>
+  public async readFile<T extends undefined>(
+    options:
+      | Omit<FilehandleOptions, 'encoding'>
+      | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
+  ): Promise<Buffer>
+  public async readFile<T extends BufferEncoding>(
+    options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
+  ): Promise<string>
+  public async readFile(
+    options?: FilehandleOptions | BufferEncoding,
+  ): Promise<Buffer | string> {
     let encoding
     if (typeof options === 'string') {
       encoding = options
