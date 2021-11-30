@@ -23,9 +23,7 @@
     "lint": "eslint --ext .ts src test",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
-    "build": "npm run build:types && npm run build:js",
+    "build": "tsc",
     "watch": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline --watch",
     "preversion": "npm run lint && npm test && npm run build",
     "version": "standard-changelog && git add CHANGELOG.md",
@@ -38,24 +36,16 @@
     "genomics"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.9.6",
     "es6-promisify": "^6.1.1",
     "file-uri-to-path": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-typescript": "^7.3.3",
     "@types/fetch-mock": "^7.3.0",
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^27.0.3",
     "@types/node": "^13.13.5",
     "@types/range-parser": "^1.2.3",
     "@typescript-eslint/eslint-plugin": "^2.32.0",
     "@typescript-eslint/parser": "^2.32.0",
-    "babel-eslint": "^10.0.1",
     "cross-fetch": "^3.0.3",
     "eslint": "^7.0.0",
     "eslint-config-airbnb-base": "^14.1.0",
@@ -64,14 +54,14 @@
     "eslint-plugin-jest": "^23.11.0",
     "eslint-plugin-prettier": "^3.1.3",
     "fetch-mock": "^9.7.0",
-    "jest": "^26.0.1",
+    "jest": "^27.4.2",
     "prettier": "^2.0.5",
     "range-parser": "^1.2.1",
     "rimraf": "^3.0.2",
     "standard-changelog": "^2.0.24",
     "tenacious-fetch": "^2.3.0",
-    "ts-jest": "^25.5.1",
-    "typescript": "^3.5.1"
+    "ts-jest": "^27.0.7",
+    "typescript": "^4.5.2"
   },
   "publishConfig": {
     "access": "public"
