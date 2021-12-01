@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-
+//@ts-nocheck
 import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
 import tenaciousFetch from 'tenacious-fetch'

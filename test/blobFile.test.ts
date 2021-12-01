@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+//@ts-nocheck
 import fs from 'fs'
 import { BlobFile } from '../src/'
 
