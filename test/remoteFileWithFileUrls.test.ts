@@ -15,6 +15,7 @@ describe('remote file with file urls', () => {
     expect(fileText).toEqual('testing\n')
     const fileText2 = await f.readFile({ encoding: 'utf8' })
     expect(fileText2).toEqual('testing\n')
+    // @ts-expect-error
     await expect(f.readFile('fakeEncoding')).rejects.toThrow(/encoding/)
   })
   it('reads remote partially', async () => {

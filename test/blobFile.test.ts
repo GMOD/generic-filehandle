@@ -18,6 +18,7 @@ describe('blob filehandle', () => {
     expect(fileContents).toEqual('testing\n')
     const fileContents2 = await blobFile.readFile({ encoding: 'utf8' })
     expect(fileContents2).toEqual('testing\n')
+    // @ts-expect-error
     await expect(blobFile.readFile('fakeEncoding')).rejects.toThrow(
       /unsupported encoding/,
     )

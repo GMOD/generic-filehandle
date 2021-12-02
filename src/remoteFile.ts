@@ -145,8 +145,21 @@ export default class RemoteFile implements GenericFilehandle {
     throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
+  public async readFile(): Promise<Buffer>
+  public async readFile(options: BufferEncoding): Promise<string>
+  public async readFile<T extends undefined>(
+    options:
+      | Omit<FilehandleOptions, 'encoding'>
+      | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
+  ): Promise<Buffer>
+  public async readFile<T extends BufferEncoding>(
+    options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
+  ): Promise<string>
+  readFile<T extends BufferEncoding>(
+    options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
+  ): T extends BufferEncoding ? Promise<Buffer> : Promise<Buffer | string>
   public async readFile(
-    options: FilehandleOptions | string = {},
+    options: FilehandleOptions | BufferEncoding = {},
   ): Promise<Buffer | string> {
     let encoding
     let opts
