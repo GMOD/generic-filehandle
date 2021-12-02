@@ -115,7 +115,7 @@ export default class RemoteFile implements GenericFilehandle {
     const response = await this.fetch(this.url, args)
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText}`)
+      throw new Error(`HTTP ${response.status} ${response.statusText} ${this.url}`)
     }
 
     if ((response.status === 200 && position === 0) || response.status === 206) {
