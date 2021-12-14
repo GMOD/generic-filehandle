@@ -9,6 +9,7 @@ export type Fetcher = (
  * `buffer` method on node-fetch responses.
  */
 export interface PolyfilledResponse extends Response {
+  //eslint-disable-next-line @typescript-eslint/ban-types
   buffer?: Function | void
 }
 
@@ -54,7 +55,9 @@ export interface GenericFilehandle {
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding?: T },
   ): T extends BufferEncoding ? Promise<Buffer> : Promise<Buffer | string>
-  readFile(options?: FilehandleOptions | BufferEncoding): Promise<Buffer | string>
+  readFile(
+    options?: FilehandleOptions | BufferEncoding,
+  ): Promise<Buffer | string>
   stat(): Promise<Stats>
   close(): Promise<void>
 }

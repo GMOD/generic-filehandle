@@ -78,11 +78,12 @@ describe('remote file tests', () => {
     expect(b.toString()).toEqual('testing\n')
   })
   it('reads file with response buffer method disabled', async () => {
-    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const mockedFetch = fetchMock
+      .sandbox()
+      .mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         res.buffer = 0 // obscure the buffer method to test our arraybuffer parse
         return res
@@ -98,7 +99,9 @@ describe('remote file tests', () => {
     expect(fileText).toEqual('testing\n')
     const fileText2 = await f.readFile({ encoding: 'utf8' })
     expect(fileText2).toEqual('testing\n')
-    await expect(f.readFile('fakeEncoding')).rejects.toThrow(/unsupported encoding/)
+    await expect(f.readFile('fakeEncoding')).rejects.toThrow(
+      /unsupported encoding/,
+    )
   })
   it('reads remote partially', async () => {
     fetchMock.mock('http://fakehost/test.txt', readBuffer)
@@ -146,11 +149,12 @@ describe('remote file tests', () => {
     await expect(res).rejects.toThrow(/HTTP 404/)
   })
   it('throws if response object has no buffer or arrayBuffer', async () => {
-    const mockedFetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
+    const mockedFetch = fetchMock
+      .sandbox()
+      .mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt', {
       async fetch(url, opts) {
         const res = await mockedFetch(url, opts)
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         res.buffer = undefined // obscure the buffer method to test our arraybuffer parse
         res.arrayBuffer = undefined // also obscure arrayBuffer
@@ -188,7 +192,9 @@ describe('remote file tests', () => {
       }
     })
     const f = new RemoteFile('http://fakehost/test.txt', {
-      overrides: { headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' } },
+      overrides: {
+        headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' },
+      },
     })
     const stat = await f.readFile('utf8')
     expect(stat).toBe('hello world')
@@ -207,7 +213,9 @@ describe('remote file tests', () => {
       }
     })
     const f = new RemoteFile('http://fakehost/test.txt', {
-      overrides: { headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' } },
+      overrides: {
+        headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' },
+      },
     })
     const { buffer } = await f.read(Buffer.alloc(5), 0, 5, 0)
     const str = buffer.toString()

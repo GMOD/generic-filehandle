@@ -4,7 +4,10 @@ import BlobFile from './blobFile'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 export * from './filehandle'
 
-function fromUrl(source: string, opts: FilehandleOptions = {}): GenericFilehandle {
+function fromUrl(
+  source: string,
+  opts: FilehandleOptions = {},
+): GenericFilehandle {
   return new RemoteFile(source, opts)
 }
 function open(

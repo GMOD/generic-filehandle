@@ -21,7 +21,9 @@ export default class RemoteFile implements GenericFilehandle {
   private fetchImplementation: Fetcher
   private baseOverrides: any = {}
 
-  private async getBufferFromResponse(response: PolyfilledResponse): Promise<Buffer> {
+  private async getBufferFromResponse(
+    response: PolyfilledResponse,
+  ): Promise<Buffer> {
     if (typeof response.buffer === 'function') {
       return response.buffer()
     } else if (typeof response.arrayBuffer === 'function') {
@@ -47,7 +49,6 @@ export default class RemoteFile implements GenericFilehandle {
       this.read = localFile.read.bind(localFile)
       this.readFile = localFile.readFile.bind(localFile)
       this.stat = localFile.stat.bind(localFile)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       this.fetchImplementation = (): void => {
         /* intentionally blank */
@@ -55,7 +56,8 @@ export default class RemoteFile implements GenericFilehandle {
       return
     }
 
-    const fetch = opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
+    const fetch =
+      opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
     if (!fetch) {
       throw new TypeError(
         `no fetch function supplied, and none found in global environment`,
@@ -83,7 +85,10 @@ export default class RemoteFile implements GenericFilehandle {
         console.warn(
           `generic-filehandle: refetching ${input} to attempt to work around chrome CORS header caching bug`,
         )
-        response = await this.fetchImplementation(input, { ...init, cache: 'reload' })
+        response = await this.fetchImplementation(input, {
+          ...init,
+          cache: 'reload',
+        })
       } else {
         throw e
       }
@@ -107,7 +112,11 @@ export default class RemoteFile implements GenericFilehandle {
     const args = {
       ...this.baseOverrides,
       ...overrides,
-      headers: { ...headers, ...overrides.headers, ...this.baseOverrides.headers },
+      headers: {
+        ...headers,
+        ...overrides.headers,
+        ...this.baseOverrides.headers,
+      },
       method: 'GET',
       redirect: 'follow',
       mode: 'cors',
@@ -116,10 +125,15 @@ export default class RemoteFile implements GenericFilehandle {
     const response = await this.fetch(this.url, args)
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status} ${response.statusText} ${this.url}`)
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} ${this.url}`,
+      )
     }
 
-    if ((response.status === 200 && position === 0) || response.status === 206) {
+    if (
+      (response.status === 200 && position === 0) ||
+      response.status === 206
+    ) {
       const responseData = await this.getBufferFromResponse(response)
       const bytesCopied = responseData.copy(
         buffer,
@@ -189,9 +203,12 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status !== 200) {
-      throw Object.assign(new Error(`HTTP ${response.status} fetching ${this.url}`), {
-        status: response.status,
-      })
+      throw Object.assign(
+        new Error(`HTTP ${response.status} fetching ${this.url}`),
+        {
+          status: response.status,
+        },
+      )
     }
     if (encoding === 'utf8') {
       return response.text()
