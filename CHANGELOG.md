@@ -1,3 +1,5 @@
+- Add esm module build with less babelification for smaller bundle size
+
 ## [2.2.1](https://github.com/GMOD/generic-filehandle/compare/v2.2.0...v2.2.1) (2021-10-03)
 
 
