@@ -1,3 +1,5 @@
+- Add src directory for better source map
+
 ## [2.2.2](https://github.com/GMOD/generic-filehandle/compare/v2.2.1...v2.2.2) (2021-12-14)
 
 
