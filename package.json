@@ -39,13 +39,12 @@
     "genomics"
   ],
   "dependencies": {
-    "es6-promisify": "^6.1.1",
     "file-uri-to-path": "^2.0.0"
   },
   "devDependencies": {
     "@types/fetch-mock": "^7.3.0",
     "@types/jest": "^27.0.3",
-    "@types/node": "^13.13.5",
+    "@types/node": "^17.0.34",
     "@types/range-parser": "^1.2.3",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
