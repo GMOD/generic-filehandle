@@ -47,10 +47,12 @@ export default class LocalFile implements GenericFilehandle {
   }
   // todo memoize
   public async stat(): Promise<any> {
-    return this.getFd().then(fd => fd.stat())
+    const fd = await this.getFd()
+    return fd.stat()
   }
 
   public async close(): Promise<void> {
-    return this.getFd().then(fd => fd.close())
+    const fd = await this.getFd()
+    return fd.close()
   }
 }
