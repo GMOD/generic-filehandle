@@ -1,15 +1,10 @@
 import fs from 'fs'
-import { promisify } from 'es6-promisify'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
-const fsClose = fs && promisify(fs.close)
+const fsp = fs.promises
 
 export default class LocalFile implements GenericFilehandle {
-  private fd?: any
+  private fd?: Promise<fs.promises.FileHandle>
   private filename: string
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,9 +12,9 @@ export default class LocalFile implements GenericFilehandle {
     this.filename = source
   }
 
-  private getFd(): any {
+  private getFd() {
     if (!this.fd) {
-      this.fd = fsOpen(this.filename, 'r')
+      this.fd = fsp.open(this.filename, 'r')
     }
     return this.fd
   }
@@ -31,14 +26,8 @@ export default class LocalFile implements GenericFilehandle {
     position = 0,
   ): Promise<{ bytesRead: number; buffer: Buffer }> {
     const fetchLength = Math.min(buffer.length - offset, length)
-    const ret = await fsRead(
-      await this.getFd(),
-      buffer,
-      offset,
-      fetchLength,
-      position,
-    )
-    return { bytesRead: ret, buffer }
+    const fd = await this.getFd()
+    return fd.read(buffer, offset, fetchLength, position)
   }
 
   public async readFile(): Promise<Buffer>
@@ -54,14 +43,14 @@ export default class LocalFile implements GenericFilehandle {
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
   ): Promise<Buffer | string> {
-    return fsReadFile(this.filename, options)
+    return fsp.readFile(this.filename, options)
   }
   // todo memoize
   public async stat(): Promise<any> {
-    return fsFStat(await this.getFd())
+    return this.getFd().then(fd => fd.stat())
   }
 
   public async close(): Promise<void> {
-    return fsClose(await this.getFd())
+    return this.getFd().then(fd => fd.close())
   }
 }
