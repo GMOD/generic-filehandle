@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import uri2path from 'file-uri-to-path'
 import {
   GenericFilehandle,

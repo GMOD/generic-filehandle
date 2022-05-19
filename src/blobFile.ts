@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 
 // Using this you can "await" the file like a normal promise
