@@ -1,5 +1,5 @@
+import * as url from 'url'
 import { Buffer } from 'buffer'
-import uri2path from 'file-uri-to-path'
 import {
   GenericFilehandle,
   FilehandleOptions,
@@ -42,7 +42,7 @@ export default class RemoteFile implements GenericFilehandle {
 
     // if it is a file URL, monkey-patch ourselves to act like a LocalFile
     if (source.startsWith('file://')) {
-      const path = uri2path(source)
+      const path = url.fileURLToPath(source)
       if (!path) {
         throw new TypeError('invalid file url')
       }

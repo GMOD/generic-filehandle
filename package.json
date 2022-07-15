@@ -39,8 +39,7 @@
     "genomics"
   ],
   "dependencies": {
-    "es6-promisify": "^6.1.1",
-    "file-uri-to-path": "^2.0.0"
+    "es6-promisify": "^6.1.1"
   },
   "devDependencies": {
     "@types/fetch-mock": "^7.3.0",
