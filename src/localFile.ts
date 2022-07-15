@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { Buffer } from 'buffer'
 import { promisify } from 'es6-promisify'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
