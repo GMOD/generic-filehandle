@@ -1,13 +1,12 @@
-## [2.2.3](https://github.com/GMOD/generic-filehandle/compare/v2.2.2...v2.2.3) (2022-05-19)
+- Remove the utility that converts a RemoteFile into a LocalFile when a file:/// is passed in
 
+## [2.2.3](https://github.com/GMOD/generic-filehandle/compare/v2.2.2...v2.2.3) (2022-05-19)
 
 ### Features
 
-* explicit buffer import ([#102](https://github.com/GMOD/generic-filehandle/issues/102)) ([a9223d6](https://github.com/GMOD/generic-filehandle/commit/a9223d65c4f19c59e86c0959c0512f2f83fd6ab0))
+- explicit buffer import ([#102](https://github.com/GMOD/generic-filehandle/issues/102)) ([a9223d6](https://github.com/GMOD/generic-filehandle/commit/a9223d65c4f19c59e86c0959c0512f2f83fd6ab0))
 
-
-
-- Explicitely import Buffer to try to help deployment on some bundlers
+* Explicitely import Buffer to try to help deployment on some bundlers
 
 ## [2.2.2](https://github.com/GMOD/generic-filehandle/compare/v2.2.1...v2.2.2) (2021-12-14)
 
