@@ -3,10 +3,6 @@ import fetchMock from 'fetch-mock'
 import { LocalFile, open, fromUrl } from '../src/'
 
 describe('test util functions', () => {
-  it('fromUrl', async () => {
-    const ret = fromUrl('file:///var/')
-    expect(ret.constructor.name).toEqual('RemoteFile')
-  })
   it('fromUrl local', async () => {
     const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', () => {
       /* intentionally blank */
