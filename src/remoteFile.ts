@@ -1,5 +1,4 @@
 import { Buffer } from 'buffer'
-import uri2path from 'file-uri-to-path'
 import {
   GenericFilehandle,
   FilehandleOptions,
@@ -7,7 +6,6 @@ import {
   Fetcher,
   PolyfilledResponse,
 } from './filehandle'
-import { LocalFile } from '.'
 
 const myGlobal =
   typeof window !== 'undefined'
@@ -39,23 +37,6 @@ export default class RemoteFile implements GenericFilehandle {
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source
-
-    // if it is a file URL, monkey-patch ourselves to act like a LocalFile
-    if (source.startsWith('file://')) {
-      const path = uri2path(source)
-      if (!path) {
-        throw new TypeError('invalid file url')
-      }
-      const localFile = new LocalFile(path)
-      this.read = localFile.read.bind(localFile)
-      this.readFile = localFile.readFile.bind(localFile)
-      this.stat = localFile.stat.bind(localFile)
-      // @ts-ignore
-      this.fetchImplementation = (): void => {
-        /* intentionally blank */
-      }
-      return
-    }
 
     const fetch =
       opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
