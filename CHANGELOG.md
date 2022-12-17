@@ -1,3 +1,7 @@
+## [3.0.1](https://github.com/GMOD/generic-filehandle/compare/v3.0.0...v3.0.1) (2022-12-17)
+
+
+
 
 - Fix sourceMap
 
