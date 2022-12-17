@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/generic-filehandle.svg?style=flat-square)](https://npmjs.org/package/generic-filehandle)
 [![Coverage Status](https://img.shields.io/codecov/c/github/GMOD/generic-filehandle/master.svg?style=flat-square)](https://codecov.io/gh/GMOD/generic-filehandle/branch/master)
-[![Build Status](https://img.shields.io/github/workflow/status/GMOD/generic-filehandle/Push/master?logo=github&style=flat-query)](https://github.com/GMOD/generic-filehandle/actions?query=branch%3Amaster+workflow%3APush+)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/GMOD/generic-filehandle/push.yml?branch=master)](https://github.com/GMOD/generic-filehandle/actions)
 
 Provides a uniform interface for accessing binary data from local files, remote HTTP resources, and Blob data in the browser. Implements a subset of the [Node.js v10 promise-based FileHandle API](https://nodejs.org/api/fs.html#fs_class_filehandle).
 
