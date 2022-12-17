@@ -4,6 +4,7 @@
     "types": ["node", "jest"],
     "lib": ["dom", "esnext"],
     "moduleResolution": "node",
+    "sourceMap": true,
     "outDir": "./dist",
     "strict": true,
     "removeComments": false,
