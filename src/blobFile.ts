@@ -2,56 +2,16 @@ import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 
 // Using this you can "await" the file like a normal promise
 // https://blog.shovonhasan.com/using-promises-with-filereader/
-function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result !== 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsArrayBuffer(blob)
-  })
+function readBlobAsArrayBuffer(blob: Blob) {
+  return blob.arrayBuffer()
 }
 
-function readBlobAsText(blob: Blob): Promise<string> {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result === 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsText(blob)
-  })
+function readBlobAsText(blob: Blob) {
+  return blob.text()
 }
 
 /**
- * Blob of binary data fetched from a local file (with FileReader).
+ * Blob of binary data fetched from a local file
  *
  * Adapted by Robert Buels and Garrett Stevens from the BlobFetchable object in
  * the Dalliance Genome Explorer, which is copyright Thomas Down 2006-2011.
@@ -86,6 +46,21 @@ export default class BlobFile implements GenericFilehandle {
     }
 
     return { bytesRead: result.byteLength, buffer }
+  }
+
+  public async read2(length: number, position: number): Promise<Uint8Array> {
+    // short-circuit a read of 0 bytes here, because browsers actually
+    // sometimes crash if you try to read 0 bytes from a local file!
+    if (!length) {
+      return new Uint8Array()
+    }
+
+    const start = position
+    const end = position + length
+
+    return new Uint8Array(
+      await readBlobAsArrayBuffer(this.blob.slice(start, end)),
+    )
   }
 
   public async readFile(): Promise<Uint8Array>

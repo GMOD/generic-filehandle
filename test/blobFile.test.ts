@@ -1,5 +1,6 @@
 //@ts-nocheck
 import fs from 'fs'
+import { Blob } from 'node:buffer'
 import { BlobFile } from '../src/'
 import { toString } from './util'
 
