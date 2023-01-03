@@ -1,6 +1,7 @@
 //@ts-nocheck
 import fs from 'fs'
 import { BlobFile } from '../src/'
+import { toString } from './util'
 
 describe('blob filehandle', () => {
   it('reads whole file', async () => {
@@ -8,7 +9,7 @@ describe('blob filehandle', () => {
     const blob = new Blob([fileBuf], { type: 'text/plain' })
     const blobFile = new BlobFile(blob)
     const fileContents = await blobFile.readFile()
-    expect(fileContents.toString()).toEqual('testing\n')
+    expect(toString(fileContents)).toEqual('testing\n')
   })
   it('reads whole file with encoding', async () => {
     const fileBuf = fs.readFileSync(require.resolve('./data/test.txt'))
@@ -29,7 +30,7 @@ describe('blob filehandle', () => {
     const blobFile = new BlobFile(blob)
     const buf = Buffer.allocUnsafe(3)
     const { bytesRead } = await blobFile.read(buf, 0, 3, 0)
-    expect(buf.toString()).toEqual('tes')
+    expect(toString(buf)).toEqual('tes')
     expect(bytesRead).toEqual(3)
   })
   it('reads zero length file part', async () => {
@@ -38,7 +39,7 @@ describe('blob filehandle', () => {
     const blobFile = new BlobFile(blob)
     const buf = Buffer.allocUnsafe(3)
     const { bytesRead } = await blobFile.read(buf, 0, 0, 0)
-    expect(buf.slice(0, bytesRead).toString()).toEqual('')
+    expect(toString(buf.slice(0, bytesRead))).toEqual('')
     expect(bytesRead).toEqual(0)
   })
   it('reads file part clipped at end', async () => {
@@ -47,7 +48,7 @@ describe('blob filehandle', () => {
     const blobFile = new BlobFile(blob)
     const buf = Buffer.allocUnsafe(3)
     const { bytesRead } = await blobFile.read(buf, 0, 3, 6)
-    expect(buf.slice(0, bytesRead).toString()).toEqual('g\n')
+    expect(toString(buf.slice(0, bytesRead))).toEqual('g\n')
     expect(bytesRead).toEqual(2)
   })
   it('gets stat', async () => {

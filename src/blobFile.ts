@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
 
 // Using this you can "await" the file like a normal promise
@@ -66,13 +65,13 @@ export default class BlobFile implements GenericFilehandle {
   }
 
   public async read(
-    buffer: Buffer,
+    buffer: Uint8Array,
     offset = 0,
     length: number,
     position = 0,
-  ): Promise<{ bytesRead: number; buffer: Buffer }> {
-    // short-circuit a read of 0 bytes here, because browsers actually sometimes
-    // crash if you try to read 0 bytes from a local file!
+  ): Promise<{ bytesRead: number; buffer: Uint8Array }> {
+    // short-circuit a read of 0 bytes here, because browsers actually
+    // sometimes crash if you try to read 0 bytes from a local file!
     if (!length) {
       return { bytesRead: 0, buffer }
     }
@@ -81,31 +80,32 @@ export default class BlobFile implements GenericFilehandle {
     const end = start + length
 
     const result = await readBlobAsArrayBuffer(this.blob.slice(start, end))
-    const resultBuffer = Buffer.from(result)
+    const uint8buf = new Uint8Array(result)
+    for (let i = 0; i < uint8buf.byteLength; i++) {
+      buffer[i + offset] = uint8buf[i]
+    }
 
-    const bytesCopied = resultBuffer.copy(buffer, offset)
-
-    return { bytesRead: bytesCopied, buffer: resultBuffer }
+    return { bytesRead: result.byteLength, buffer }
   }
 
-  public async readFile(): Promise<Buffer>
+  public async readFile(): Promise<Uint8Array>
   public async readFile(options: BufferEncoding): Promise<string>
   public async readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array>
   public async readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
-  ): Promise<Buffer | string> {
+  ): Promise<Uint8Array | string> {
     let encoding
     if (typeof options === 'string') {
       encoding = options
     } else {
-      encoding = options && options.encoding
+      encoding = options?.encoding
     }
     if (encoding === 'utf8') {
       return readBlobAsText(this.blob)
@@ -113,8 +113,8 @@ export default class BlobFile implements GenericFilehandle {
     if (encoding) {
       throw new Error(`unsupported encoding: ${encoding}`)
     }
-    const result = await readBlobAsArrayBuffer(this.blob)
-    return Buffer.from(result)
+    const res = await readBlobAsArrayBuffer(this.blob)
+    return new Uint8Array(res)
   }
 
   public async stat(): Promise<Stats> {
