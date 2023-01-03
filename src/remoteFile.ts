@@ -76,6 +76,62 @@ export default class RemoteFile implements GenericFilehandle {
     return response
   }
 
+  public async read2(
+    length: number,
+    position: number,
+    opts: FilehandleOptions = {},
+  ) {
+    const { headers = {}, signal, overrides = {} } = opts
+    if (length < Infinity) {
+      headers.range = `bytes=${position}-${position + length}`
+    } else if (length === Infinity && position !== 0) {
+      headers.range = `bytes=${position}-`
+    }
+    const args = {
+      ...this.baseOverrides,
+      ...overrides,
+      headers: {
+        ...headers,
+        ...overrides.headers,
+        ...this.baseOverrides.headers,
+      },
+      method: 'GET',
+      redirect: 'follow',
+      mode: 'cors',
+      signal,
+    }
+    const response = await this.fetch(this.url, args)
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status} ${response.statusText} ${this.url}`,
+      )
+    }
+
+    if (
+      (response.status === 200 && position === 0) ||
+      response.status === 206
+    ) {
+      const ret = await this.getBufferFromResponse(response)
+
+      // try to parse out the size of the remote file
+      const res = response.headers.get('content-range')
+      const sizeMatch = /\/(\d+)$/.exec(res || '')
+      if (sizeMatch && sizeMatch[1]) {
+        this._stat = { size: parseInt(sizeMatch[1], 10) }
+      }
+
+      return ret
+    }
+
+    if (response.status === 200) {
+      throw new Error(`${this.url} fetch returned status 200, expected 206`)
+    }
+
+    // TODO: try harder here to gather more information about what the problem is
+    throw new Error(`HTTP ${response.status} fetching ${this.url}`)
+  }
+
   public async read(
     buffer: Uint8Array,
     offset = 0,
@@ -132,7 +188,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if (response.status === 200) {
-      throw new Error('${this.url} fetch returned status 200, expected 206')
+      throw new Error(`${this.url} fetch returned status 200, expected 206`)
     }
 
     // TODO: try harder here to gather more information about what the problem is

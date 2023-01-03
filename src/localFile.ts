@@ -24,6 +24,12 @@ export default class LocalFile implements GenericFilehandle {
     return this.fd
   }
 
+  public async read2(length: number, position = 0): Promise<Uint8Array> {
+    const b = new Uint8Array(length)
+    await fsRead(await this.getFd(), b, 0, length, position)
+    return b
+  }
+
   public async read(
     buffer: Uint8Array,
     offset = 0,

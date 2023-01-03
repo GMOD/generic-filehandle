@@ -35,6 +35,12 @@ export interface Stats {
 }
 
 export interface GenericFilehandle {
+  read2(
+    length: number,
+    position: number,
+    opts?: FilehandleOptions,
+  ): Promise<Uint8Array>
+
   read(
     buf: Uint8Array,
     offset: number,
@@ -42,24 +48,37 @@ export interface GenericFilehandle {
     position: number,
     opts?: FilehandleOptions,
   ): Promise<{ bytesRead: number; buffer: Uint8Array }>
+
+  // no args, return Uint8Array
   readFile(): Promise<Uint8Array>
+
+  // BufferEncoding arg, return string
   readFile(options: BufferEncoding): Promise<string>
+
+  // options without encoding, return Uint8Array
   readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
   ): Promise<Uint8Array>
+
+  // options with encoding, return string
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
+
+  // unknown
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding?: T },
   ): T extends BufferEncoding
     ? Promise<Uint8Array>
     : Promise<Uint8Array | string>
+
+  // unknown
   readFile(
     options?: FilehandleOptions | BufferEncoding,
   ): Promise<Uint8Array | string>
+
   stat(): Promise<Stats>
   close(): Promise<void>
 }
