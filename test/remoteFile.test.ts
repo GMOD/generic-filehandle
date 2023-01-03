@@ -47,7 +47,7 @@ describe('remote file tests', () => {
       fetch: tenaciousFetch,
     })
     const b = await f.readFile({ overrides: { fetcher: fetch } })
-    expect(b.toString()).toEqual('testing\n')
+    expect(toString(b)).toEqual('testing\n')
   })
   it('tenacious fetch with 404', async () => {
     const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', 404)
@@ -72,13 +72,13 @@ describe('remote file tests', () => {
       overrides: { fetcher: fetch, retries: 0 },
     })
     const b = await f.readFile()
-    expect(b.toString()).toEqual('testing\n')
+    expect(toString(b)).toEqual('testing\n')
   })
   it('reads file', async () => {
     const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
     const f = new RemoteFile('http://fakehost/test.txt', { fetch })
     const b = await f.readFile()
-    expect(b.toString()).toEqual('testing\n')
+    expect(toString(b)).toEqual('testing\n')
   })
   it('reads file with response buffer method disabled', async () => {
     const mockedFetch = fetchMock
@@ -93,7 +93,7 @@ describe('remote file tests', () => {
       },
     })
     const b = await f.readFile()
-    expect(b.toString()).toEqual('testing\n')
+    expect(toString(b)).toEqual('testing\n')
   })
   it('reads file with encoding', async () => {
     fetchMock.mock('http://fakehost/test.txt', readFile)

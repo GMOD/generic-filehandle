@@ -25,8 +25,7 @@ export default class RemoteFile implements GenericFilehandle {
     if (typeof response.buffer === 'function') {
       return response.buffer()
     } else if (typeof response.arrayBuffer === 'function') {
-      const resp = await response.arrayBuffer()
-      return Buffer.from(resp)
+      return new Uint8Array(await response.arrayBuffer())
     } else {
       throw new TypeError(
         'invalid HTTP response object, has no buffer method, and no arrayBuffer method',
