@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 //@ts-nocheck
 import fetchMock from 'fetch-mock'
-import { LocalFile, RemoteFile } from '../src/'
 import tenaciousFetch from 'tenacious-fetch'
-
 import rangeParser from 'range-parser'
+
+// locals
+import { LocalFile, RemoteFile } from '../src/'
+import { toString } from './util'
+
 fetchMock.config.sendAsJson = false
 
 const getFile = (url: string) =>
@@ -108,7 +111,7 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(3)
     const { bytesRead } = await f.read(buf, 0, 3, 0)
-    expect(buf.toString()).toEqual('tes')
+    expect(toString(buf)).toEqual('tes')
     expect(bytesRead).toEqual(3)
   })
   it('reads remote clipped at the end', async () => {
@@ -131,7 +134,7 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.allocUnsafe(5)
     const { bytesRead } = await f.read(buf, 0, Infinity, 3)
-    expect(buf.toString()).toEqual('ting\n')
+    expect(toString(buf)).toEqual('ting\n')
     expect(bytesRead).toEqual(5)
   })
   it('throws error', async () => {
@@ -170,8 +173,8 @@ describe('remote file tests', () => {
     const f = new RemoteFile('http://fakehost/test.txt')
     const buf = Buffer.alloc(10)
     const res = await f.read(buf, 0, 0, 0)
-    expect(buf.toString().length).toBe(10)
-    expect(buf.toString()[0]).toBe('\0')
+    expect(toString(buf).length).toBe(10)
+    expect(toString(buf)[0]).toBe('\0')
     expect(res.bytesRead).toEqual(0)
   })
   it('stat', async () => {
