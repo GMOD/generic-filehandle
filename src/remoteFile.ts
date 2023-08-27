@@ -12,6 +12,8 @@ const myGlobal =
     ? window
     : typeof self !== 'undefined'
     ? self
+    : typeof global !== 'undefined'
+    ? global
     : { fetch: undefined }
 
 export default class RemoteFile implements GenericFilehandle {
