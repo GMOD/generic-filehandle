@@ -7,15 +7,6 @@ import {
   PolyfilledResponse,
 } from './filehandle'
 
-const myGlobal =
-  typeof window !== 'undefined'
-    ? window
-    : typeof self !== 'undefined'
-    ? self
-    : typeof global !== 'undefined'
-    ? global
-    : { fetch: undefined }
-
 export default class RemoteFile implements GenericFilehandle {
   protected url: string
   private _stat?: Stats
@@ -40,8 +31,7 @@ export default class RemoteFile implements GenericFilehandle {
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source
 
-    const fetch =
-      opts.fetch || (myGlobal.fetch && myGlobal.fetch.bind(myGlobal))
+    const fetch = opts.fetch || globalThis.fetch
     if (!fetch) {
       throw new TypeError(
         `no fetch function supplied, and none found in global environment`,
