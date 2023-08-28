@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+/**
+ * @jest-environment node
+ */
 import { LocalFile } from '../src/'
 
 describe('local file tests', () => {
