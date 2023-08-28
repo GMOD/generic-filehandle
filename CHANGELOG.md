@@ -1,3 +1,7 @@
+# [3.1.0](https://github.com/GMOD/generic-filehandle/compare/v3.0.1...v3.1.0) (2023-08-28)
+
+
+
 - Look for fetch in globalThis
 
 ## [3.0.1](https://github.com/GMOD/generic-filehandle/compare/v3.0.0...v3.0.1) (2022-12-17)
