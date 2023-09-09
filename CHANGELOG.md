@@ -1,3 +1,7 @@
+## [3.1.1](https://github.com/GMOD/generic-filehandle/compare/v3.1.0...v3.1.1) (2023-09-09)
+
+
+
 - Use bind to make sure fetch has the right scope
 
 # [3.1.0](https://github.com/GMOD/generic-filehandle/compare/v3.0.1...v3.1.0) (2023-08-28)
