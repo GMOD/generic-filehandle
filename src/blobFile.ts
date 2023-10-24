@@ -1,55 +1,4 @@
-import { Buffer } from 'buffer'
 import { GenericFilehandle, FilehandleOptions, Stats } from './filehandle'
-
-// Using this you can "await" the file like a normal promise
-// https://blog.shovonhasan.com/using-promises-with-filereader/
-function readBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result !== 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsArrayBuffer(blob)
-  })
-}
-
-function readBlobAsText(blob: Blob): Promise<string> {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result === 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsText(blob)
-  })
-}
 
 /**
  * Blob of binary data fetched from a local file (with FileReader).
@@ -65,56 +14,41 @@ export default class BlobFile implements GenericFilehandle {
     this.size = blob.size
   }
 
-  public async read(
-    buffer: Buffer,
-    offset = 0,
-    length: number,
-    position = 0,
-  ): Promise<{ bytesRead: number; buffer: Buffer }> {
+  public async read(length: number, position = 0): Promise<Uint8Array> {
     // short-circuit a read of 0 bytes here, because browsers actually sometimes
     // crash if you try to read 0 bytes from a local file!
     if (!length) {
-      return { bytesRead: 0, buffer }
+      return new Uint8Array()
     }
 
     const start = position
     const end = start + length
 
-    const result = await readBlobAsArrayBuffer(this.blob.slice(start, end))
-    const resultBuffer = Buffer.from(result)
-
-    const bytesCopied = resultBuffer.copy(buffer, offset)
-
-    return { bytesRead: bytesCopied, buffer: resultBuffer }
+    const result = await this.blob.slice(start, end).arrayBuffer()
+    return new Uint8Array(result)
   }
 
-  public async readFile(): Promise<Buffer>
+  public async readFile(): Promise<Uint8Array>
   public async readFile(options: BufferEncoding): Promise<string>
   public async readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array>
   public async readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
-  ): Promise<Buffer | string> {
-    let encoding
-    if (typeof options === 'string') {
-      encoding = options
-    } else {
-      encoding = options && options.encoding
-    }
+  ): Promise<Uint8Array | string> {
+    const encoding = typeof options === 'string' ? options : options?.encoding
     if (encoding === 'utf8') {
-      return readBlobAsText(this.blob)
-    }
-    if (encoding) {
+      return this.blob.text()
+    } else if (encoding) {
       throw new Error(`unsupported encoding: ${encoding}`)
+    } else {
+      return new Uint8Array(await this.blob.arrayBuffer())
     }
-    const result = await readBlobAsArrayBuffer(this.blob)
-    return Buffer.from(result)
   }
 
   public async stat(): Promise<Stats> {

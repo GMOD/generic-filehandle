@@ -1,10 +1,8 @@
-import { Buffer } from 'buffer'
 import {
   GenericFilehandle,
   FilehandleOptions,
   Stats,
   Fetcher,
-  PolyfilledResponse,
 } from './filehandle'
 
 export default class RemoteFile implements GenericFilehandle {
@@ -13,19 +11,9 @@ export default class RemoteFile implements GenericFilehandle {
   private fetchImplementation: Fetcher
   private baseOverrides: any = {}
 
-  private async getBufferFromResponse(
-    response: PolyfilledResponse,
-  ): Promise<Buffer> {
-    if (typeof response.buffer === 'function') {
-      return response.buffer()
-    } else if (typeof response.arrayBuffer === 'function') {
-      const resp = await response.arrayBuffer()
-      return Buffer.from(resp)
-    } else {
-      throw new TypeError(
-        'invalid HTTP response object, has no buffer method, and no arrayBuffer method',
-      )
-    }
+  private async getUint8ArrayFromResponse(res: Response): Promise<Uint8Array> {
+    const resp = await res.arrayBuffer()
+    return new Uint8Array(resp)
   }
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
@@ -45,10 +33,10 @@ export default class RemoteFile implements GenericFilehandle {
   public async fetch(
     input: RequestInfo,
     init: RequestInit | undefined,
-  ): Promise<PolyfilledResponse> {
-    let response
+  ): Promise<Response> {
+    let res
     try {
-      response = await this.fetchImplementation(input, init)
+      res = await this.fetchImplementation(input, init)
     } catch (e) {
       if (`${e}`.includes('Failed to fetch')) {
         // refetch to to help work around a chrome bug (discussed in
@@ -58,7 +46,7 @@ export default class RemoteFile implements GenericFilehandle {
         console.warn(
           `generic-filehandle: refetching ${input} to attempt to work around chrome CORS header caching bug`,
         )
-        response = await this.fetchImplementation(input, {
+        res = await this.fetchImplementation(input, {
           ...init,
           cache: 'reload',
         })
@@ -66,16 +54,14 @@ export default class RemoteFile implements GenericFilehandle {
         throw e
       }
     }
-    return response
+    return res
   }
 
   public async read(
-    buffer: Buffer,
-    offset = 0,
     length: number,
     position = 0,
     opts: FilehandleOptions = {},
-  ): Promise<{ bytesRead: number; buffer: Buffer }> {
+  ): Promise<Uint8Array> {
     const { headers = {}, signal, overrides = {} } = opts
     if (length < Infinity) {
       headers.range = `bytes=${position}-${position + length}`
@@ -95,60 +81,50 @@ export default class RemoteFile implements GenericFilehandle {
       mode: 'cors',
       signal,
     }
-    const response = await this.fetch(this.url, args)
+    const res = await this.fetch(this.url, args)
 
-    if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status} ${response.statusText} ${this.url}`,
-      )
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText} ${this.url}`)
     }
 
-    if (
-      (response.status === 200 && position === 0) ||
-      response.status === 206
-    ) {
-      const responseData = await this.getBufferFromResponse(response)
-      const bytesCopied = responseData.copy(
-        buffer,
-        offset,
-        0,
-        Math.min(length, responseData.length),
-      )
+    if ((res.status === 200 && position === 0) || res.status === 206) {
+      const resData = new Uint8Array(await res.arrayBuffer())
 
       // try to parse out the size of the remote file
-      const res = response.headers.get('content-range')
-      const sizeMatch = /\/(\d+)$/.exec(res || '')
-      if (sizeMatch && sizeMatch[1]) {
+      const range = res.headers.get('content-range')
+      const sizeMatch = /\/(\d+)$/.exec(range || '')
+      if (sizeMatch?.[1]) {
         this._stat = { size: parseInt(sizeMatch[1], 10) }
       }
 
-      return { bytesRead: bytesCopied, buffer }
+      return resData
     }
 
-    if (response.status === 200) {
-      throw new Error('${this.url} fetch returned status 200, expected 206')
+    if (res.status === 200) {
+      throw new Error(`HTTP ${res.status} fetching ${this.url}, expected 206`)
+    } else {
+      throw new Error(`HTTP ${res.status} fetching ${this.url}`)
     }
-
-    // TODO: try harder here to gather more information about what the problem is
-    throw new Error(`HTTP ${response.status} fetching ${this.url}`)
   }
 
-  public async readFile(): Promise<Buffer>
+  public async readFile(): Promise<Uint8Array>
   public async readFile(options: BufferEncoding): Promise<string>
   public async readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array>
   public async readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
-  ): T extends BufferEncoding ? Promise<Buffer> : Promise<Buffer | string>
+  ): T extends BufferEncoding
+    ? Promise<Uint8Array>
+    : Promise<Uint8Array | string>
   public async readFile(
     options: FilehandleOptions | BufferEncoding = {},
-  ): Promise<Buffer | string> {
+  ): Promise<Uint8Array | string> {
     let encoding
     let opts
     if (typeof options === 'string') {
@@ -189,13 +165,12 @@ export default class RemoteFile implements GenericFilehandle {
     if (encoding) {
       throw new Error(`unsupported encoding: ${encoding}`)
     }
-    return this.getBufferFromResponse(response)
+    return this.getUint8ArrayFromResponse(response)
   }
 
   public async stat(): Promise<Stats> {
     if (!this._stat) {
-      const buf = Buffer.allocUnsafe(10)
-      await this.read(buf, 0, 10, 0)
+      await this.read(10, 0)
       if (!this._stat) {
         throw new Error(`unable to determine size of file at ${this.url}`)
       }
