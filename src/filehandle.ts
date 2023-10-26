@@ -1,17 +1,7 @@
 export type Fetcher = (
   input: RequestInfo,
   init?: RequestInit,
-) => Promise<PolyfilledResponse>
-
-/**
- * a fetch response object that might have some additional properties
- * that come from the underlying fetch implementation, such as the
- * `buffer` method on node-fetch responses.
- */
-export interface PolyfilledResponse extends Response {
-  //eslint-disable-next-line @typescript-eslint/ban-types
-  buffer?: Function | void
-}
+) => Promise<Response>
 
 export interface FilehandleOptions {
   /**
@@ -36,28 +26,28 @@ export interface Stats {
 
 export interface GenericFilehandle {
   read(
-    buf: Buffer,
-    offset: number,
     length: number,
     position: number,
     opts?: FilehandleOptions,
-  ): Promise<{ bytesRead: number; buffer: Buffer }>
-  readFile(): Promise<Buffer>
+  ): Promise<Uint8Array>
+  readFile(): Promise<Uint8Array>
   readFile(options: BufferEncoding): Promise<string>
   readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array>
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding?: T },
-  ): T extends BufferEncoding ? Promise<Buffer> : Promise<Buffer | string>
+  ): T extends BufferEncoding
+    ? Promise<Uint8Array>
+    : Promise<Uint8Array | string>
   readFile(
     options?: FilehandleOptions | BufferEncoding,
-  ): Promise<Buffer | string>
+  ): Promise<Uint8Array | string>
   stat(): Promise<Stats>
   close(): Promise<void>
 }

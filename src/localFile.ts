@@ -1,68 +1,56 @@
-import fs from 'fs'
-import { Buffer } from 'buffer'
-import { promisify } from 'es6-promisify'
+import { promises as fs } from 'fs'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
-const fsClose = fs && promisify(fs.close)
-
 export default class LocalFile implements GenericFilehandle {
-  private fd?: any
+  private fd?: Promise<fs.FileHandle>
+
   private filename: string
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public constructor(source: string, opts: FilehandleOptions = {}) {
+  public constructor(source: string, _opts: FilehandleOptions = {}) {
     this.filename = source
   }
 
-  private getFd(): any {
+  private getFd() {
     if (!this.fd) {
-      this.fd = fsOpen(this.filename, 'r')
+      this.fd = fs.open(this.filename)
     }
     return this.fd
   }
 
-  public async read(
-    buffer: Buffer,
-    offset = 0,
-    length: number,
-    position = 0,
-  ): Promise<{ bytesRead: number; buffer: Buffer }> {
-    const fetchLength = Math.min(buffer.length - offset, length)
-    const ret = await fsRead(
-      await this.getFd(),
-      buffer,
-      offset,
-      fetchLength,
+  public async read(length: number, position = 0): Promise<Uint8Array> {
+    const fd = await this.getFd()
+    const { bytesRead, buffer } = await fd.read(
+      Buffer.alloc(length),
+      0,
+      length,
       position,
     )
-    return { bytesRead: ret, buffer }
+    return buffer.subarray(0, bytesRead)
   }
 
-  public async readFile(): Promise<Buffer>
+  public async readFile(): Promise<Uint8Array>
   public async readFile(options: BufferEncoding): Promise<string>
   public async readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array>
   public async readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
-  ): Promise<Buffer | string> {
-    return fsReadFile(this.filename, options)
+  ): Promise<Uint8Array | string> {
+    return fs.readFile(this.filename, options)
   }
   // todo memoize
   public async stat(): Promise<any> {
-    return fsFStat(await this.getFd())
+    const fd = await this.getFd()
+    return fd.stat()
   }
 
   public async close(): Promise<void> {
-    return fsClose(await this.getFd())
+    const fd = await this.getFd()
+    fd.close()
   }
 }
