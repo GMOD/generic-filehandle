@@ -1,32 +1,31 @@
-import fs from 'fs'
-import { promisify } from 'es6-promisify'
+import { promises as fs } from 'fs'
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 
-const fsOpen = fs && promisify(fs.open)
-const fsRead = fs && promisify(fs.read)
-const fsFStat = fs && promisify(fs.fstat)
-const fsReadFile = fs && promisify(fs.readFile)
-const fsClose = fs && promisify(fs.close)
-
 export default class LocalFile implements GenericFilehandle {
-  private fd?: any
+  private fd?: Promise<fs.FileHandle>
+
   private filename: string
 
   public constructor(source: string, _opts: FilehandleOptions = {}) {
     this.filename = source
   }
 
-  private getFd(): any {
+  private getFd() {
     if (!this.fd) {
-      this.fd = fsOpen(this.filename, 'r')
+      this.fd = fs.open(this.filename)
     }
     return this.fd
   }
 
   public async read(length: number, position = 0): Promise<Uint8Array> {
-    const buf = Buffer.alloc(length)
-    fsRead(await this.getFd(), buf, 0, length, position)
-    return buf
+    const fd = await this.getFd()
+    const { bytesRead, buffer } = await fd.read(
+      Buffer.alloc(length),
+      0,
+      length,
+      position,
+    )
+    return buffer.subarray(0, bytesRead)
   }
 
   public async readFile(): Promise<Uint8Array>
@@ -42,14 +41,16 @@ export default class LocalFile implements GenericFilehandle {
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
   ): Promise<Uint8Array | string> {
-    return fsReadFile(this.filename, options)
+    return fs.readFile(this.filename, options)
   }
   // todo memoize
   public async stat(): Promise<any> {
-    return fsFStat(await this.getFd())
+    const fd = await this.getFd()
+    return fd.stat()
   }
 
   public async close(): Promise<void> {
-    return fsClose(await this.getFd())
+    const fd = await this.getFd()
+    fd.close()
   }
 }
