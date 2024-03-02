@@ -102,11 +102,7 @@ export default class BlobFile implements GenericFilehandle {
     options?: FilehandleOptions | BufferEncoding,
   ): Promise<Buffer | string> {
     let encoding
-    if (typeof options === 'string') {
-      encoding = options
-    } else {
-      encoding = options && options.encoding
-    }
+    encoding = typeof options === 'string' ? options : options?.encoding
     if (encoding === 'utf8') {
       return readBlobAsText(this.blob)
     }

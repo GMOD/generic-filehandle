@@ -1,6 +1,6 @@
 import LocalFile from './localFile'
 import RemoteFile from './remoteFile'
-import BlobFile from './blobFile'
+
 import { GenericFilehandle, FilehandleOptions } from './filehandle'
 export * from './filehandle'
 
@@ -28,4 +28,9 @@ function open(
   throw new Error('no url, path, or filehandle provided, cannot open')
 }
 
-export { open, fromUrl, RemoteFile, LocalFile, BlobFile }
+export { open, fromUrl }
+
+export { default as BlobFile } from './blobFile'
+export { default as RemoteFile } from './remoteFile'
+
+export { default as LocalFile } from './localFile'

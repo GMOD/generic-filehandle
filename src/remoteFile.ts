@@ -118,7 +118,7 @@ export default class RemoteFile implements GenericFilehandle {
       // try to parse out the size of the remote file
       const res = response.headers.get('content-range')
       const sizeMatch = /\/(\d+)$/.exec(res || '')
-      if (sizeMatch && sizeMatch[1]) {
+      if (sizeMatch?.[1]) {
         this._stat = { size: parseInt(sizeMatch[1], 10) }
       }
 

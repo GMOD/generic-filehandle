@@ -182,14 +182,12 @@ describe('remote file tests', () => {
   })
   it('auth token', async () => {
     fetchMock.mock('http://fakehost/test.txt', (url: string, args: any) => {
-      if (args.headers.Authorization) {
-        return {
-          status: 200,
-          body: 'hello world',
-        }
-      } else {
-        return { status: 403 }
-      }
+      return args.headers.Authorization
+        ? {
+            status: 200,
+            body: 'hello world',
+          }
+        : { status: 403 }
     })
     const f = new RemoteFile('http://fakehost/test.txt', {
       overrides: {
