@@ -1,3 +1,7 @@
+## [3.1.2](https://github.com/GMOD/generic-filehandle/compare/v3.1.1...v3.1.2) (2024-3-4)
+
+
+
 - Fix response.buffer deprecation warning (always use response.arrayBuffer and Buffer.from)
 
 ## [3.1.1](https://github.com/GMOD/generic-filehandle/compare/v3.1.0...v3.1.1) (2023-09-09)
