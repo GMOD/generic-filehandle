@@ -101,8 +101,7 @@ export default class BlobFile implements GenericFilehandle {
   public async readFile(
     options?: FilehandleOptions | BufferEncoding,
   ): Promise<Buffer | string> {
-    let encoding
-    encoding = typeof options === 'string' ? options : options?.encoding
+    const encoding = typeof options === 'string' ? options : options?.encoding
     if (encoding === 'utf8') {
       return readBlobAsText(this.blob)
     }

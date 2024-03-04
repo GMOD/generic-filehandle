@@ -66,6 +66,7 @@ module.exports = {
     'unicorn/prefer-number-properties': 'off',
     'unicorn/no-process-exit': 'off',
     'unicorn/prefer-at': 'off',
+    'unicorn/prefer-blob-reading-methods': 'off',
 
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/no-unsafe-argument': 'off',
