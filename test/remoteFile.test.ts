@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-//@ts-nocheck
 import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
+// @ts-expect-error
 import tenaciousFetch from 'tenacious-fetch'
 
 import rangeParser from 'range-parser'
@@ -13,6 +13,7 @@ const getFile = (url: string) =>
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)
   const range = rangeParser(10000, args.headers.range)
+  // @ts-expect-error
   const { start, end } = range[0]
   const len = end - start
   let buf = Buffer.alloc(len)
@@ -98,6 +99,7 @@ test('reads file with encoding', async () => {
   expect(fileText).toEqual('testing\n')
   const fileText2 = await f.readFile({ encoding: 'utf8' })
   expect(fileText2).toEqual('testing\n')
+  // @ts-expect-error
   await expect(f.readFile('fakeEncoding')).rejects.toThrow(
     /unsupported encoding/,
   )

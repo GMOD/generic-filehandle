@@ -1,1 +1,0 @@
-declare module 'tenacious-fetch'
