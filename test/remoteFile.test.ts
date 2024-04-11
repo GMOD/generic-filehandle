@@ -140,7 +140,7 @@ test('throws error', async () => {
   const f = new RemoteFile('http://fakehost/test.txt')
   const buf = Buffer.alloc(10)
   const res = f.read(buf, 0, 0, 0)
-  await expect(res).rejects.toThrow(/Internal Server Error/)
+  await expect(res).rejects.toThrow(/HTTP 500/)
 })
 test('throws error if file missing', async () => {
   fetchMock.mock('http://fakehost/test.txt', 404)
