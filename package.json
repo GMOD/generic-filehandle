@@ -61,7 +61,7 @@
     "prettier": "^3.2.5",
     "range-parser": "^1.2.1",
     "rimraf": "^5.0.5",
-    "standard-changelog": "^5.0.0",
+    "standard-changelog": "^6.0.0",
     "tenacious-fetch": "^2.3.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.3.3"

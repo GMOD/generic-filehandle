@@ -7,6 +7,14 @@ import {
   PolyfilledResponse,
 } from './filehandle'
 
+function getMessage(e: unknown) {
+  const r =
+    typeof e === 'object' && e !== null && 'message' in e
+      ? (e.message as string)
+      : `${e}`
+  return r.replace(/\.$/, '')
+}
+
 export default class RemoteFile implements GenericFilehandle {
   protected url: string
   private _stat?: Stats
@@ -56,10 +64,10 @@ export default class RemoteFile implements GenericFilehandle {
             cache: 'reload',
           })
         } catch (e) {
-          throw new Error(`${e} fetching ${input}`, { cause: e })
+          throw new Error(`${getMessage(e)} fetching ${input}`, { cause: e })
         }
       } else {
-        throw new Error(`${e} fetching ${input}`, { cause: e })
+        throw new Error(`${getMessage(e)} fetching ${input}`, { cause: e })
       }
     }
     return response
@@ -78,7 +86,7 @@ export default class RemoteFile implements GenericFilehandle {
     } else if (length === Infinity && position !== 0) {
       headers.range = `bytes=${position}-`
     }
-    const args = {
+    const res = await this.fetch(this.url, {
       ...this.baseOverrides,
       ...overrides,
       headers: {
@@ -90,8 +98,7 @@ export default class RemoteFile implements GenericFilehandle {
       redirect: 'follow',
       mode: 'cors',
       signal,
-    }
-    const res = await this.fetch(this.url, args)
+    })
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status} fetching ${this.url}`)
@@ -151,7 +158,7 @@ export default class RemoteFile implements GenericFilehandle {
       delete opts.encoding
     }
     const { headers = {}, signal, overrides = {} } = opts
-    const args = {
+    const res = await this.fetch(this.url, {
       headers,
       method: 'GET',
       redirect: 'follow',
@@ -159,22 +166,16 @@ export default class RemoteFile implements GenericFilehandle {
       signal,
       ...this.baseOverrides,
       ...overrides,
-    }
-    const response = await this.fetch(this.url, args)
-
-    if (!response) {
-      throw new Error('generic-filehandle failed to fetch')
-    }
-
-    if (response.status !== 200) {
-      throw new Error(`HTTP ${response.status} fetching ${this.url}`)
+    })
+    if (res.status !== 200) {
+      throw new Error(`HTTP ${res.status} fetching ${this.url}`)
     }
     if (encoding === 'utf8') {
-      return response.text()
+      return res.text()
     } else if (encoding) {
       throw new Error(`unsupported encoding: ${encoding}`)
     } else {
-      return this.getBufferFromResponse(response)
+      return this.getBufferFromResponse(res)
     }
   }
 
