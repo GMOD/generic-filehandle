@@ -29,8 +29,6 @@ function open(
 }
 
 export { open, fromUrl }
-
 export { default as BlobFile } from './blobFile'
 export { default as RemoteFile } from './remoteFile'
-
 export { default as LocalFile } from './localFile'

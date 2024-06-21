@@ -46,7 +46,12 @@ export default [
           ignoreRestSiblings: true,
         },
       ],
-
+      'no-console': [
+        'warn',
+        {
+          allow: ['error', 'warn'],
+        },
+      ],
       'no-underscore-dangle': 0,
       curly: 'error',
       '@typescript-eslint/no-explicit-any': 0,
