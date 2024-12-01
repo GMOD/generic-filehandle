@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import fs from 'fs'
 import { BlobFile } from '../src/'
 import { TextDecoder } from 'util'
@@ -6,53 +7,53 @@ function toString(a: Uint8Array<ArrayBuffer>) {
   return new TextDecoder('utf8').decode(a)
 }
 
-Blob.prototype.text = function () {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result === 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsText(this)
-  })
-}
-
-Blob.prototype.arrayBuffer = function () {
-  const fileReader = new FileReader()
-
-  return new Promise((resolve, reject): void => {
-    fileReader.onerror = (): void => {
-      fileReader.abort()
-      reject(new Error('problem reading blob'))
-    }
-
-    fileReader.onabort = (): void => {
-      reject(new Error('blob reading was aborted'))
-    }
-
-    fileReader.onload = (): void => {
-      if (fileReader.result && typeof fileReader.result !== 'string') {
-        resolve(fileReader.result)
-      } else {
-        reject(new Error('unknown error reading blob'))
-      }
-    }
-    fileReader.readAsArrayBuffer(this)
-  })
-}
+// Blob.prototype.text = function () {
+//   const fileReader = new FileReader()
+//
+//   return new Promise((resolve, reject): void => {
+//     fileReader.onerror = (): void => {
+//       fileReader.abort()
+//       reject(new Error('problem reading blob'))
+//     }
+//
+//     fileReader.onabort = (): void => {
+//       reject(new Error('blob reading was aborted'))
+//     }
+//
+//     fileReader.onload = (): void => {
+//       if (fileReader.result && typeof fileReader.result === 'string') {
+//         resolve(fileReader.result)
+//       } else {
+//         reject(new Error('unknown error reading blob'))
+//       }
+//     }
+//     fileReader.readAsText(this)
+//   })
+// }
+//
+// Blob.prototype.arrayBuffer = function () {
+//   const fileReader = new FileReader()
+//
+//   return new Promise((resolve, reject): void => {
+//     fileReader.onerror = (): void => {
+//       fileReader.abort()
+//       reject(new Error('problem reading blob'))
+//     }
+//
+//     fileReader.onabort = (): void => {
+//       reject(new Error('blob reading was aborted'))
+//     }
+//
+//     fileReader.onload = (): void => {
+//       if (fileReader.result && typeof fileReader.result !== 'string') {
+//         resolve(fileReader.result)
+//       } else {
+//         reject(new Error('unknown error reading blob'))
+//       }
+//     }
+//     fileReader.readAsArrayBuffer(this)
+//   })
+// }
 
 test('reads whole file', async () => {
   const fileBuf = fs.readFileSync(require.resolve('./data/test.txt'))

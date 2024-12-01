@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import { LocalFile } from '../src/'
 import { TextDecoder } from 'util'
 

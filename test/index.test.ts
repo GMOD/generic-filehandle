@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import fetchMock from 'fetch-mock'
 import { LocalFile, open, fromUrl } from '../src/'
 

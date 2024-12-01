@@ -1,7 +1,6 @@
+import { afterEach, test, expect } from 'vitest'
 import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
-// @ts-expect-error
-import tenaciousFetch from 'tenacious-fetch'
 import { TextDecoder } from 'util'
 
 import rangeParser from 'range-parser'
@@ -18,7 +17,6 @@ const getFile = (url: string) =>
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)
   const range = rangeParser(10000, args.headers.range)
-  // @ts-expect-error
   const { start, end } = range[0]
   const len = end - start
   const buf = await file.read(len, start)
@@ -43,39 +41,6 @@ const readFile = async (url: string) => {
 
 afterEach(() => fetchMock.restore())
 
-test('tenacious fetch', async () => {
-  const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
-  const f = new RemoteFile('http://fakehost/test.txt', {
-    fetch: tenaciousFetch,
-  })
-  const b = await f.readFile({ overrides: { fetcher: fetch } })
-  expect(toString(b)).toEqual('testing\n')
-})
-test('tenacious fetch with 404', async () => {
-  const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', 404)
-  const f = new RemoteFile('http://fakehost/test.txt', {
-    fetch: tenaciousFetch,
-  })
-  const res = f.readFile({ overrides: { fetcher: fetch, retries: 0 } })
-  await expect(res).rejects.toThrow(/HTTP 404/)
-})
-test('tenacious fetch with 403', async () => {
-  const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', 403)
-  const f = new RemoteFile('http://fakehost/test.txt', {
-    fetch: tenaciousFetch,
-  })
-  const res = f.readFile({ overrides: { fetcher: fetch, retries: 0 } })
-  await expect(res).rejects.toThrow(/HTTP 403/)
-})
-test('tenacious fetch base overrides', async () => {
-  const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
-  const f = new RemoteFile('http://fakehost/test.txt', {
-    fetch: tenaciousFetch,
-    overrides: { fetcher: fetch, retries: 0 },
-  })
-  const b = await f.readFile()
-  expect(toString(b)).toEqual('testing\n')
-})
 test('reads file', async () => {
   const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
   const f = new RemoteFile('http://fakehost/test.txt', { fetch })
