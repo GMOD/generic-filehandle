@@ -1,9 +1,14 @@
 import { LocalFile } from '../src/'
+import { TextDecoder } from 'util'
+
+function toString(a: Uint8Array<ArrayBuffer>) {
+  return new TextDecoder('utf8').decode(a)
+}
 
 test('reads file', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))
   const b = await f.readFile()
-  expect(b.toString()).toEqual('testing\n')
+  expect(toString(b)).toEqual('testing\n')
 })
 test('reads file with encoding', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))
@@ -14,32 +19,20 @@ test('reads file with encoding', async () => {
 })
 test('reads local file', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))
-  const buf = Buffer.allocUnsafe(3)
-  const { bytesRead } = await f.read(buf, 0, 3, 0)
-  expect(buf.toString()).toEqual('tes')
-  expect(bytesRead).toEqual(3)
+  const buf = await f.read(3, 0)
+  expect(toString(buf)).toEqual('tes')
 })
-test('length infinity', async () => {
-  const f = new LocalFile(require.resolve('./data/test.txt'))
-  const buf = Buffer.allocUnsafe(5)
-  const { bytesRead } = await f.read(buf, 0, Infinity, 3)
-  expect(buf.toString()).toEqual('ting\n')
-  expect(bytesRead).toEqual(5)
-})
+
 test('zero read', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))
-  const buf = Buffer.alloc(10)
-  const { bytesRead } = await f.read(buf, 0, 0, 0)
-  expect(buf.toString().length).toBe(10)
-  expect(buf.toString()[0]).toBe('\0')
-  expect(bytesRead).toEqual(0)
+  const buf = await f.read(0, 0)
+  expect(toString(buf)[0]).toBe(undefined)
 })
 test('reads local file clipped at the end', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))
-  const buf = Buffer.allocUnsafe(3)
-  const { bytesRead, buffer: buf2 } = await f.read(buf, 0, 3, 6)
-  expect(buf2.slice(0, bytesRead).toString()).toEqual('g\n')
-  expect(bytesRead).toEqual(2)
+  const buf = await f.read(3, 6)
+  const s = toString(buf).replace('\0', '')
+  expect(s).toEqual('g\n')
 })
 test('get stat', async () => {
   const f = new LocalFile(require.resolve('./data/test.txt'))

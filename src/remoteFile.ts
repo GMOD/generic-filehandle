@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import {
   GenericFilehandle,
   FilehandleOptions,
@@ -20,13 +19,6 @@ export default class RemoteFile implements GenericFilehandle {
   private _stat?: Stats
   private fetchImplementation: Fetcher
   private baseOverrides: any = {}
-
-  private async getBufferFromResponse(
-    response: PolyfilledResponse,
-  ): Promise<Buffer> {
-    const resp = await response.arrayBuffer()
-    return Buffer.from(resp)
-  }
 
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source
@@ -74,12 +66,10 @@ export default class RemoteFile implements GenericFilehandle {
   }
 
   public async read(
-    buffer: Buffer,
-    offset = 0,
     length: number,
-    position = 0,
+    position: number,
     opts: FilehandleOptions = {},
-  ): Promise<{ bytesRead: number; buffer: Buffer }> {
+  ): Promise<Uint8Array<ArrayBuffer>> {
     const { headers = {}, signal, overrides = {} } = opts
     if (length < Infinity) {
       headers.range = `bytes=${position}-${position + length}`
@@ -105,13 +95,7 @@ export default class RemoteFile implements GenericFilehandle {
     }
 
     if ((res.status === 200 && position === 0) || res.status === 206) {
-      const resData = await this.getBufferFromResponse(res)
-      const bytesCopied = resData.copy(
-        buffer,
-        offset,
-        0,
-        Math.min(length, resData.length),
-      )
+      const resData = await res.arrayBuffer()
 
       // try to parse out the size of the remote file
       const contentRange = res.headers.get('content-range')
@@ -120,33 +104,35 @@ export default class RemoteFile implements GenericFilehandle {
         this._stat = { size: parseInt(sizeMatch[1], 10) }
       }
 
-      return { bytesRead: bytesCopied, buffer }
+      return new Uint8Array(resData.slice(0, length))
     }
 
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (res.status === 200) {
       throw new Error(`${this.url} fetch returned status 200, expected 206`)
+    } else {
+      throw new Error(`HTTP ${res.status} fetching ${this.url}`)
     }
-
-    // TODO: try harder here to gather more information about what the problem is
-    throw new Error(`HTTP ${res.status} fetching ${this.url}`)
   }
 
-  public async readFile(): Promise<Buffer>
+  public async readFile(): Promise<Uint8Array<ArrayBuffer>>
   public async readFile(options: BufferEncoding): Promise<string>
   public async readFile<T extends undefined>(
     options:
       | Omit<FilehandleOptions, 'encoding'>
       | (Omit<FilehandleOptions, 'encoding'> & { encoding: T }),
-  ): Promise<Buffer>
+  ): Promise<Uint8Array<ArrayBuffer>>
   public async readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
   ): Promise<string>
   readFile<T extends BufferEncoding>(
     options: Omit<FilehandleOptions, 'encoding'> & { encoding: T },
-  ): T extends BufferEncoding ? Promise<Buffer> : Promise<Buffer | string>
+  ): T extends BufferEncoding
+    ? Promise<Uint8Array<ArrayBuffer>>
+    : Promise<Uint8Array<ArrayBuffer> | string>
   public async readFile(
     options: FilehandleOptions | BufferEncoding = {},
-  ): Promise<Buffer | string> {
+  ): Promise<Uint8Array<ArrayBuffer> | string> {
     let encoding
     let opts
     if (typeof options === 'string') {
@@ -175,14 +161,13 @@ export default class RemoteFile implements GenericFilehandle {
     } else if (encoding) {
       throw new Error(`unsupported encoding: ${encoding}`)
     } else {
-      return this.getBufferFromResponse(res)
+      return new Uint8Array(await res.arrayBuffer())
     }
   }
 
   public async stat(): Promise<Stats> {
     if (!this._stat) {
-      const buf = Buffer.allocUnsafe(10)
-      await this.read(buf, 0, 10, 0)
+      await this.read(10, 0)
       if (!this._stat) {
         throw new Error(`unable to determine size of file at ${this.url}`)
       }

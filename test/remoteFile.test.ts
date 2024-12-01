@@ -2,12 +2,18 @@ import fetchMock from 'fetch-mock'
 import { LocalFile, RemoteFile } from '../src/'
 // @ts-expect-error
 import tenaciousFetch from 'tenacious-fetch'
+import { TextDecoder } from 'util'
 
 import rangeParser from 'range-parser'
 fetchMock.config.sendAsJson = false
 
+function toString(a: Uint8Array<ArrayBuffer>) {
+  return new TextDecoder('utf8').decode(a)
+}
+
 const getFile = (url: string) =>
   new LocalFile(require.resolve(url.replace('http://fakehost/', './data/')))
+
 // fakes server responses from local file object with fetchMock
 const readBuffer = async (url: string, args: any) => {
   const file = getFile(url)
@@ -15,14 +21,14 @@ const readBuffer = async (url: string, args: any) => {
   // @ts-expect-error
   const { start, end } = range[0]
   const len = end - start
-  let buf = Buffer.alloc(len)
-  const res = await file.read(buf, 0, len, start)
+  const buf = await file.read(len, start)
   const stat = await file.stat()
-  buf = buf.slice(0, res.bytesRead)
   return {
     status: 206,
     body: buf,
-    headers: { 'Content-Range': `${start}-${end}/${stat.size}` },
+    headers: {
+      'Content-Range': `${start}-${end}/${stat.size}`,
+    },
   }
 }
 
@@ -43,7 +49,7 @@ test('tenacious fetch', async () => {
     fetch: tenaciousFetch,
   })
   const b = await f.readFile({ overrides: { fetcher: fetch } })
-  expect(b.toString()).toEqual('testing\n')
+  expect(toString(b)).toEqual('testing\n')
 })
 test('tenacious fetch with 404', async () => {
   const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', 404)
@@ -68,13 +74,13 @@ test('tenacious fetch base overrides', async () => {
     overrides: { fetcher: fetch, retries: 0 },
   })
   const b = await f.readFile()
-  expect(b.toString()).toEqual('testing\n')
+  expect(toString(b)).toEqual('testing\n')
 })
 test('reads file', async () => {
   const fetch = fetchMock.sandbox().mock('http://fakehost/test.txt', readFile)
   const f = new RemoteFile('http://fakehost/test.txt', { fetch })
   const b = await f.readFile()
-  expect(b.toString()).toEqual('testing\n')
+  expect(toString(b)).toEqual('testing\n')
 })
 test('reads file with response buffer method disabled', async () => {
   const mockedFetch = fetchMock
@@ -89,7 +95,7 @@ test('reads file with response buffer method disabled', async () => {
     },
   })
   const b = await f.readFile()
-  expect(b.toString()).toEqual('testing\n')
+  expect(toString(b)).toEqual('testing\n')
 })
 test('reads file with encoding', async () => {
   fetchMock.mock('http://fakehost/test.txt', readFile)
@@ -106,58 +112,36 @@ test('reads file with encoding', async () => {
 test('reads remote partially', async () => {
   fetchMock.mock('http://fakehost/test.txt', readBuffer)
   const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.allocUnsafe(3)
-  const { bytesRead } = await f.read(buf, 0, 3, 0)
-  expect(buf.toString()).toEqual('tes')
-  expect(bytesRead).toEqual(3)
+  const buf = await f.read(3, 0)
+  expect(toString(buf)).toEqual('tes')
 })
 test('reads remote clipped at the end', async () => {
   fetchMock.mock('http://fakehost/test.txt', readBuffer)
   const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.allocUnsafe(3)
-  const res = await f.read(buf, 0, 3, 6)
-  expect(buf.slice(0, res.bytesRead).toString()).toEqual('g\n')
-  expect(res.bytesRead).toEqual(2)
+  const buf = await f.read(3, 6)
+  expect(toString(buf).replace('\0', '')).toEqual('g\n')
 })
-test('reads remote clipped at the end again', async () => {
-  fetchMock.mock('http://fakehost/test.txt', readBuffer)
-  const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.allocUnsafe(3)
-  expect((await f.read(buf, 3, 3, 6)).bytesRead).toEqual(0) // test writing fully past end of buf
-  expect((await f.read(buf, 2, 3, 6)).bytesRead).toEqual(1) // test writing partially past end of buf
-})
-test('length infinity', async () => {
-  fetchMock.mock('http://fakehost/test.txt', readBuffer)
-  const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.allocUnsafe(5)
-  const { bytesRead } = await f.read(buf, 0, Infinity, 3)
-  expect(buf.toString()).toEqual('ting\n')
-  expect(bytesRead).toEqual(5)
-})
+
 test('throws error', async () => {
   fetchMock.mock('http://fakehost/test.txt', 500)
   const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.alloc(10)
-  const res = f.read(buf, 0, 0, 0)
+  const res = f.read(0, 0)
   await expect(res).rejects.toThrow(/HTTP 500/)
 })
 test('throws error if file missing', async () => {
   fetchMock.mock('http://fakehost/test.txt', 404)
   const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.alloc(10)
-  const res = f.read(buf, 0, 0, 0)
+  const res = f.read(0, 0)
   await expect(res).rejects.toThrow(/HTTP 404/)
 })
 
 test('zero read', async () => {
   fetchMock.mock('http://fakehost/test.txt', readBuffer)
   const f = new RemoteFile('http://fakehost/test.txt')
-  const buf = Buffer.alloc(10)
-  const res = await f.read(buf, 0, 0, 0)
-  expect(buf.toString().length).toBe(10)
-  expect(buf.toString()[0]).toBe('\0')
-  expect(res.bytesRead).toEqual(0)
+  const buf = toString(await f.read(0, 0))
+  expect(buf).toBe('')
 })
+
 test('stat', async () => {
   fetchMock.mock('http://fakehost/test.txt', readBuffer)
   const f = new RemoteFile('http://fakehost/test.txt')
@@ -199,7 +183,6 @@ test('auth token with range request', async () => {
       headers: { Authorization: 'Basic YWxhZGRpbjpvcGVuc2VzYW1l' },
     },
   })
-  const { buffer } = await f.read(Buffer.alloc(5), 0, 5, 0)
-  const str = buffer.toString()
-  expect(str).toBe('hello')
+  const buffer = await f.read(5, 0)
+  expect(toString(buffer)).toBe('hello')
 })
