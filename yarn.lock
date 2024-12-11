@@ -3165,10 +3165,10 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
 
-typescript@^5.8.0-dev.20241201:
-  version "5.8.0-dev.20241201"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.0-dev.20241201.tgz#d76d893340b96d2f8e7204b17aeb76650b5e2f23"
-  integrity sha512-c2pVSFoS1eJha1eBBNtuZoMkjQFOT9X+ib53SGU2psP+JCzoJxEXbobq9jwa7vauq45NB92wVPKaKgpqyCTaqQ==
+typescript@^5.8.0:
+  version "5.8.0-dev.20241211"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.0-dev.20241211.tgz#f6485c7f5f3c2779d1672785f561c3e14342498f"
+  integrity sha512-0Y3jLj2YHE2oulcW2viCZKxvWZpHMqnwuw9umTFCRA1/BNs2bkmh1pDH50lqh+4yQa7ukGLJfV22Bva7nOvm+w==
 
 uglify-js@^3.1.4:
   version "3.19.1"

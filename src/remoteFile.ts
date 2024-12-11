@@ -104,7 +104,7 @@ export default class RemoteFile implements GenericFilehandle {
         this._stat = { size: parseInt(sizeMatch[1], 10) }
       }
 
-      return new Uint8Array(resData.slice(0, length))
+      return new Uint8Array(resData)
     }
 
     // eslint-disable-next-line unicorn/prefer-ternary
