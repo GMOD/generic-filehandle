@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": ["node"],
     "lib": ["dom", "esnext"],
+    "target": "es2020",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "./dist",

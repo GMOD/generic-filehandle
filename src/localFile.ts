@@ -17,7 +17,7 @@ export default class LocalFile implements GenericFilehandle {
     const fd = await open(this.filename, 'r')
     const res = await fd.read(arr, 0, length, position)
     await fd.close()
-    return res.buffer
+    return res.buffer.subarray(0, res.bytesRead)
   }
 
   public async readFile(): Promise<Uint8Array<ArrayBuffer>>
