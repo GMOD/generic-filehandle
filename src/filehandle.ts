@@ -1,17 +1,7 @@
 export type Fetcher = (
   input: RequestInfo,
   init?: RequestInit,
-) => Promise<PolyfilledResponse>
-
-/**
- * a fetch response object that might have some additional properties
- * that come from the underlying fetch implementation, such as the
- * `buffer` method on node-fetch responses.
- */
-export interface PolyfilledResponse extends Response {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  buffer?: Function | void
-}
+) => Promise<Response>
 
 export interface FilehandleOptions {
   /**

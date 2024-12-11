@@ -3,7 +3,6 @@ import {
   FilehandleOptions,
   Stats,
   Fetcher,
-  PolyfilledResponse,
 } from './filehandle'
 
 function getMessage(e: unknown) {
@@ -23,11 +22,6 @@ export default class RemoteFile implements GenericFilehandle {
   public constructor(source: string, opts: FilehandleOptions = {}) {
     this.url = source
     const fetch = opts.fetch || globalThis.fetch.bind(globalThis)
-    if (!fetch) {
-      throw new TypeError(
-        `no fetch function supplied, and none found in global environment`,
-      )
-    }
     if (opts.overrides) {
       this.baseOverrides = opts.overrides
     }
@@ -37,7 +31,7 @@ export default class RemoteFile implements GenericFilehandle {
   public async fetch(
     input: RequestInfo,
     init: RequestInit | undefined,
-  ): Promise<PolyfilledResponse> {
+  ): Promise<Response> {
     let response
     try {
       response = await this.fetchImplementation(input, init)
@@ -168,6 +162,7 @@ export default class RemoteFile implements GenericFilehandle {
   public async stat(): Promise<Stats> {
     if (!this._stat) {
       await this.read(10, 0)
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!this._stat) {
         throw new Error(`unable to determine size of file at ${this.url}`)
       }
