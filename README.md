@@ -1,3 +1,5 @@
+NOTE: please see https://github.com/GMOD/generic-filehandle2 for new work, with modified API and no Buffer polyfill neded
+
 # generic-filehandle
 
 [![NPM version](https://img.shields.io/npm/v/generic-filehandle.svg?style=flat-square)](https://npmjs.org/package/generic-filehandle)
