@@ -1,4 +1,4 @@
-NOTE: please see https://github.com/GMOD/generic-filehandle2 for new work, with modified API and no Buffer polyfill neded
+NOTE: please see https://github.com/GMOD/generic-filehandle2 for new work, with modified API and no Buffer polyfill needed
 
 # generic-filehandle
 
@@ -20,7 +20,9 @@ const local = new LocalFile('/some/file/path/file.txt')
 const remote = new RemoteFile('http://somesite.com/file.txt')
 
 // operate on blob objects
-const blobfile = new BlobFile(new Blob([some_existing_buffer], { type: 'text/plain' }))
+const blobfile = new BlobFile(
+  new Blob([some_existing_buffer], { type: 'text/plain' }),
+)
 
 // read slice of file, works on remote files with range request, pre-allocate buffer
 const buf = Buffer.alloc(10)
