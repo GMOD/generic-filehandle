@@ -1,3 +1,7 @@
+# [3.4.0](https://github.com/GMOD/generic-filehandle/compare/v3.2.0...v3.4.0) (2025-12-11)
+
+
+
 # [3.2.0](https://github.com/GMOD/generic-filehandle/compare/v3.1.2...v3.2.0) (2024-06-21)
 
 
