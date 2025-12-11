@@ -85,3 +85,7 @@ specifying that will cause the file contents to be returned as a string. For com
 ## References
 
 This library implements a subset of the [Node.js v10 promise-based FileHandle API](https://nodejs.org/api/fs.html#fs_class_filehandle).
+
+## Footnote
+
+v3.3.0 was a mispublish of generic-filehandle2 into the generic-filehandle npm package. If you have the option, update to generic-filehandle2! Much less hacky than this repo
