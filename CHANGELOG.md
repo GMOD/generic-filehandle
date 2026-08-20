@@ -1,10 +1,13 @@
 # [3.4.0](https://github.com/GMOD/generic-filehandle/compare/v3.2.0...v3.4.0) (2025-12-11)
 
-
+- Note in the README that new work should go to generic-filehandle2, which has a modified API and no Buffer polyfill needed
+- Fix a README typo
+- Bump dependencies
 
 # [3.2.0](https://github.com/GMOD/generic-filehandle/compare/v3.1.2...v3.2.0) (2024-06-21)
 
-
+- Wrap fetch errors with the request URL instead of throwing the raw underlying error, and extract a clean message from non-Error throwables
+- Remove old babel and lint config, restore some ts-ignores, fix the eslint config, and disable the no-console rule
 
 ## [3.1.2](https://github.com/GMOD/generic-filehandle/compare/v3.1.1...v3.1.2) (2024-3-4)
 
@@ -51,6 +54,7 @@
 - resolve empty for node-specific modules in browser context ([#88](https://github.com/GMOD/generic-filehandle/issues/88)) ([044ab0f](https://github.com/GMOD/generic-filehandle/commit/044ab0f581c6937f98e309855e50f5102c0a94e8))
 
 * Use "browser" field of package.json to hide localFile import of 'fs' instead of hiding behind webpack flag. Thanks to @manzt for contributing! (#88)
+* Add a `close()` method to all implementations (LocalFile, RemoteFile, BlobFile)
 
 # [2.1.0](https://github.com/GMOD/generic-filehandle/compare/v2.0.3...v2.1.0) (2021-03-10)
 
@@ -88,6 +92,7 @@ const f = new RemoteFile("http://yourwebsite/file.bam", {
 
 - Add ability to read a fetch response's Body().buffer() instead of Body.arrayBuffer() that is normally returned
 - Fix issue with using un-polyfilled fetch
+- Fix a RangeError when copying a response buffer shorter than the requested length, by clamping the copy length to the buffer's actual size
 
 ## [1.0.8](https://github.com/GMOD/generic-filehandle/compare/v1.0.7...v1.0.8) (2019-04-17)
 
