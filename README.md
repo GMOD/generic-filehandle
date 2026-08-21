@@ -1,4 +1,4 @@
-NOTE: please see https://github.com/GMOD/generic-filehandle2 for new work, with modified API and no Buffer polyfill needed. For remote reads, https://github.com/GMOD/range-cache-filehandle caches byte ranges under a generic-filehandle2 handle.
+NOTE: please see https://github.com/GMOD/generic-filehandle2 for new work, with modified API and no Buffer polyfill needed. If you are reading remote files, https://github.com/GMOD/range-cache-filehandle sits underneath a generic-filehandle2 handle and caches the byte ranges it fetches.
 
 # generic-filehandle
 
