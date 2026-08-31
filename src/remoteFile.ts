@@ -179,10 +179,10 @@ export default class RemoteFile implements GenericFilehandle {
     }
   }
 
-  public async stat(): Promise<Stats> {
+  public async stat(opts?: { signal?: AbortSignal }): Promise<Stats> {
     if (!this._stat) {
       const buf = Buffer.allocUnsafe(10)
-      await this.read(buf, 0, 10, 0)
+      await this.read(buf, 0, 10, 0, opts)
       if (!this._stat) {
         throw new Error(`unable to determine size of file at ${this.url}`)
       }
